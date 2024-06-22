@@ -29,10 +29,12 @@ class ShopRepository {
     // Process each shop document
     for (var doc in snapshot.docs) {
       var shop = ShopModel.fromFirestore(doc);
+      
       bool shouldAddShop = false;
       
       // Check if shop name starts with the search query
-      print(shop.shop_name);
+      print(shop);
+      print(doc.id);
 
       print(!shop.shop_name.toLowerCase().startsWith(searchQuery!.toLowerCase() ?? ""));
       if (searchQuery != null && !shop.shop_name.toLowerCase().startsWith(searchQuery.toLowerCase())) {

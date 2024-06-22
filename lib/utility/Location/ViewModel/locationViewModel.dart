@@ -1,25 +1,40 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:location/location.dart';
 
-// LocationState class to hold latitude and longitude
-class LocationState {
-  final double? latitude;
-  final double? longitude;
 
-  LocationState({this.latitude, this.longitude});
-}
+class LocationService {
+  final Location _location = Location();
 
-// LocationNotifier class to manage location state
-class LocationNotifier extends StateNotifier<LocationState> {
-  LocationNotifier() : super(LocationState());
+  Stream<LocationData?> getLocationStream() async* {
+    bool serviceEnabled = await _location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await _location.requestService();
+      if (!serviceEnabled) {
+        yield null;
+        return;
+      }
+    }
 
-  void setLocation(double latitude, double longitude) {
-    state = LocationState(latitude: latitude, longitude: longitude);
+    PermissionStatus permissionGranted = await _location.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await _location.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
+        yield null;
+        return;
+      }
+    }
+    print(_location.onLocationChanged);
+    print("shiva prasad");
+    yield* _location.onLocationChanged;
   }
 }
 
-// Provider for LocationNotifier
-final locationProvider = StateNotifierProvider<LocationNotifier, LocationState>((ref) {
-  return LocationNotifier();
+
+final locationServiceProvider = Provider<LocationService>((ref) {
+  return LocationService();
 });
 
+final locationStreamProvider = StreamProvider<LocationData?>((ref) {
+  final locationService = ref.watch(locationServiceProvider);
+  return locationService.getLocationStream();
+});

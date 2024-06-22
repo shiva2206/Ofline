@@ -105,7 +105,7 @@ class _ShopCardState extends ConsumerState<ShopCard> {
                                       maintainState: true,
                                       builder: (context) =>
                                           
-                                          const Product_Screen(),
+                                           Product_Screen(shopId: widget.shop.id, startingYear: widget.shop.startingYear,),
                                     ));
                                   },
                                   child: Image.network(

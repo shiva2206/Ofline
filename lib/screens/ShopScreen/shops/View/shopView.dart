@@ -55,7 +55,7 @@ class _Home_Body_ScreenState extends ConsumerState<Home_Body_Screen> {
   Widget build(BuildContext context) {
     var mqw = MediaQuery.of(context).size.width;
     var mqh = MediaQuery.of(context).size.height;
-
+    // final location = ref.watch(locationServiceProvider);
     final shopListAsyncValue = ref.watch(shopListProvider(ref.watch(searchTextProvider)));
     // final locate = ref.watch(loca);
     return MaterialApp(
