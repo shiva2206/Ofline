@@ -18,7 +18,7 @@ class _BnbLessScreenState extends State<BnbLessScreen> {
 
   List<Widget> bnbScreen = [
     const Home_Body_Screen(),
-    const Favourite_Screen(),
+     Favourite_Screen(),
     const History_Screen()
   ];
 

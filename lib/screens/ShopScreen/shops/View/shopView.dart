@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:location/location.dart';
 import 'package:ofline_app/screens/ShopScreen/shops/View/shopCardView.dart';
+import 'package:ofline_app/utility/Location/View/locationView.dart';
 import 'package:ofline_app/utility/Location/ViewModel/locationViewModel.dart';
 import 'package:ofline_app/utility/Widgets/animatedSearch/ViewModel/searchViewModel.dart';
 import 'package:share_plus/share_plus.dart';
@@ -20,7 +21,9 @@ import '../ViewModel/shopViewModel.dart';
 
 
 class Home_Body_Screen extends ConsumerStatefulWidget {
-  const Home_Body_Screen({super.key});
+  
+  
+  const Home_Body_Screen({super.key,});
 
   @override
   ConsumerState<Home_Body_Screen> createState() => _Home_Body_ScreenState();
@@ -31,7 +34,8 @@ class _Home_Body_ScreenState extends ConsumerState<Home_Body_Screen> {
     @override
   void initState() {
     super.initState();
-  
+    final locationService = ref.read(locationServiceProvider);
+    locationService.fetchAndSetLocation();
   }
 
 
@@ -55,7 +59,7 @@ class _Home_Body_ScreenState extends ConsumerState<Home_Body_Screen> {
   Widget build(BuildContext context) {
     var mqw = MediaQuery.of(context).size.width;
     var mqh = MediaQuery.of(context).size.height;
-    // final location = ref.watch(locationServiceProvider);
+    
     final shopListAsyncValue = ref.watch(shopListProvider(ref.watch(searchTextProvider)));
     // final locate = ref.watch(loca);
     return MaterialApp(
@@ -67,18 +71,24 @@ class _Home_Body_ScreenState extends ConsumerState<Home_Body_Screen> {
               title: MySearchBar(hintext: 'Search'),
             ),
             drawer: buildDrawer(mqw, mqh, context),
-            body: shopListAsyncValue.when(data: (shops) {
-              return ListView.builder(
-                  itemCount: shops.length,
-                  itemBuilder: (BuildContext context, int index
-                      ) {
-                    final shop = shops[index];
-                    return ShopCard(shop: shop, mqh: mqh, mqw: mqw); });
-            }, error: (error, stackTrace) {
-              return Center(child: Text('Error: $error'));
-            }, loading: () {
-              return const CircularProgressIndicator(color: Colors.transparent);
-            })));
+            body: RefreshIndicator(
+              onRefresh: ()async{
+                  await ref.read(locationServiceProvider).fetchAndSetLocation();
+                },
+              color: kBlue,
+              child: shopListAsyncValue.when(data: (shops) {
+                return ListView.builder(
+                    itemCount: shops.length,
+                    itemBuilder: (BuildContext context, int index
+                        ) {
+                      final shop = shops[index];
+                      return ShopCard(key:ValueKey(shop.id),shop: shop, mqh: mqh, mqw: mqw); });
+              }, error: (error, stackTrace) {
+                return Center(child: Text('Error: $error'));
+              }, loading: () {
+                return const CircularProgressIndicator(color: Colors.transparent);
+              }),
+            )));
   }
 
 

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ofline_app/screens/ShopScreen/products/View/productView.dart';
@@ -7,7 +8,7 @@ import 'package:ofline_app/utility/Location/Model/locationModel.dart';
 import 'package:ofline_app/utility/Location/ViewModel/locationViewModel.dart';
 
 class ShopCard extends ConsumerStatefulWidget {
-  ShopCard({super.key,required this.shop,required this.mqh,required this.mqw});
+  ShopCard({required super.key,required this.shop,required this.mqh,required this.mqw});
   final shop;
   final mqh,mqw;
   @override
@@ -21,6 +22,39 @@ class _ShopCardState extends ConsumerState<ShopCard> {
  
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   
+  Future<void> addShopToFavorites(String shopId) async {
+  final firestore = FirebaseFirestore.instance;
+  final customerId = FirebaseAuth.instance.currentUser!.uid;
+  try {
+    await firestore
+        .collection('Customer')
+        .doc(customerId)
+        .collection('Favorite')
+        .doc(shopId)
+        .set({
+      'fav_shop': shopId // Optional: Add other fields as necessary
+    });
+    print("Shop added to favorites!");
+  } catch (e) {
+    print("Error adding shop to favorites: $e");
+  }
+}
+Future<void> removeShopFromFavorites(String shopId) async {
+  final firestore = FirebaseFirestore.instance;
+  final customerId = FirebaseAuth.instance.currentUser!.uid ;
+
+  try {
+    await firestore
+        .collection('Customer')
+        .doc(customerId)
+        .collection('Favorites')
+        .doc(shopId)
+        .delete();
+    print("Shop removed from favorites!");
+  } catch (e) {
+    print("Error removing shop from favorites: $e");
+  }
+}
 
   Future<void> updateFavCount(String shopId, int newFavCount) async {
     try {
@@ -35,6 +69,7 @@ class _ShopCardState extends ConsumerState<ShopCard> {
     }
   
   }
+  
   Future<void> updateViewCount(String shopId, int newViewCount) async {
     try {
       DocumentReference shopRef = _firestore.collection('Shop').doc(shopId);
@@ -146,6 +181,7 @@ class _ShopCardState extends ConsumerState<ShopCard> {
                                                   isActive = false;
                                                 });
                                                 updateFavCount(widget.shop.id, widget.shop.fav_count - 1);
+                                                removeShopFromFavorites(widget.shop.id);
                                                 setState(() {
                                                   _favourite = false;
                                                   isActive=true;
@@ -158,11 +194,12 @@ class _ShopCardState extends ConsumerState<ShopCard> {
                                               ),
                                             )
                                           : GestureDetector(
-                                              onTap: isActive ? () {
+                                              onTap: isActive ? () async{
                                                 setState(() {
                                                   isActive = false;
                                                 });
                                                  updateFavCount(widget.shop.id, widget.shop.fav_count + 1);
+                                                  await addShopToFavorites(widget.shop.id);
                                                 setState(() {
                                                   _favourite = true;
                                                   isActive = true;
@@ -201,8 +238,8 @@ class _ShopCardState extends ConsumerState<ShopCard> {
                                         ),
                                       ),
                                       SizedBox(width: widget.mqw * 1 / 1080),
-                                      const Text(
-                                        "100 m" ,
+                                       Text(
+                                        widget.shop.distanceText ,
                                         style: const TextStyle(
                                             color: kBlue,
                                             fontSize: 14.5,

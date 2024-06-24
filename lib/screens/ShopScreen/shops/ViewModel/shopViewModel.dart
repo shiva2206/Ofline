@@ -3,7 +3,9 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:location/location.dart';
+import 'package:ofline_app/screens/ShopScreen/products/Model/productModel.dart';
 import 'package:ofline_app/utility/Location/Model/locationModel.dart';
+import 'package:ofline_app/utility/Location/View/locationView.dart';
 import 'package:ofline_app/utility/Location/ViewModel/locationViewModel.dart';
 
 import '../Model/shopModel.dart';
@@ -13,9 +15,52 @@ import '../Model/shopModel.dart';
 class ShopRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  Stream<List<ShopModel>> fetchShopsAndProducts({String? searchQuery,double? latitude,double? longitude}) async* {
+    await for (QuerySnapshot shopSnapshot in _firestore.collection('Shop').snapshots()) {
+      List<ShopModel> shops = [];
+
+      for (QueryDocumentSnapshot shopDoc in shopSnapshot.docs) {
+        final shop = ShopModel.fromFirestore(shopDoc);
+        if(latitude!=null && longitude!=null){
+          shop.distance = calculateDistanceInKm(latitude, longitude, shop.latitude, shop.longitude);
+          shop.distanceText = formatDistance(shop.distance);
+          print("_________________________SHiba");
+        }
+        print(latitude==null);
+        print("katitude");
+        if(shop.shop_name.toLowerCase().startsWith(searchQuery ?? "")){
+          shops.add(shop);
+          continue;
+        }
+
+        QuerySnapshot productSnapshot = await _firestore
+            .collection('Shop')
+            .doc(shop.id)
+            .collection('Product')
+            .get();
+
+       for(QueryDocumentSnapshot prodDoc in productSnapshot.docs){
+        final product = ProductModel.fromFirestore(prodDoc);
+        if(product.product_name.toLowerCase().startsWith(searchQuery ??"")){
+          shops.add(shop);
+          break;
+        }
+       
+       }
+
+       
+      }
+       shops.sort((a, b) => a.distance.compareTo(b.distance));
+      yield shops;
+    }
+  }
+ 
   Stream<List<ShopModel>> fetchShops({String? searchQuery}) {
+
+    
   Query<Map<String, dynamic>> query = FirebaseFirestore.instance.collection('Shop');
   
+
       // final container = ProviderContainer();
   // Filter shops by name if a search query is provided
   if (searchQuery != null && searchQuery.isNotEmpty) {
@@ -37,6 +82,7 @@ class ShopRepository {
       print(doc.id);
 
       print(!shop.shop_name.toLowerCase().startsWith(searchQuery!.toLowerCase() ?? ""));
+      if(!shop.isActivated) continue;
       if (searchQuery != null && !shop.shop_name.toLowerCase().startsWith(searchQuery.toLowerCase())) {
         // Fetch products if the shop name does not match
         
@@ -75,13 +121,38 @@ class ShopRepository {
 }
 
 }
+
+
+
+  double calculateDistanceInKm(
+      double lat1, double lon1, double lat2, double lon2) {
+    const double p = 0.017453292519943295;
+
+    final a = 0.5 -
+        cos((lat2 - lat1) * p) / 2 +
+        cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2;
+
+    double distanceInKm = 12742 * asin(sqrt(a));
+    return double.parse(distanceInKm.toStringAsFixed(1));
+  }
+
+  String formatDistance(double distanceInKm) {
+    if (distanceInKm < 1) {
+      return '${(distanceInKm * 1000).round()} m';
+    } else {
+      return '${distanceInKm.round()} km';
+    }
+  }
+
 final shopRepositoryProvider = Provider<ShopRepository>((ref) {
   return ShopRepository();
 });
 
 final shopListProvider = StreamProvider.family<List<ShopModel>, String?>((ref, searchQuery) {
   final shopRepository = ref.watch(shopRepositoryProvider);
-  return shopRepository.fetchShops(searchQuery: searchQuery);
+  final userLocation = ref.watch(locationProvider);
+
+  return shopRepository.fetchShopsAndProducts(searchQuery: searchQuery,latitude: userLocation?.latitude,longitude:userLocation?.longitude);
 });
 
   // Future<List<ShopModel>> _fetchShops({String? searchQuery}) async {
