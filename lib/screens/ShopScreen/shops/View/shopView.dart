@@ -34,8 +34,7 @@ class _Home_Body_ScreenState extends ConsumerState<Home_Body_Screen> {
     @override
   void initState() {
     super.initState();
-    final locationService = ref.read(locationServiceProvider);
-    locationService.fetchAndSetLocation();
+  
   }
 
 
@@ -76,6 +75,7 @@ class _Home_Body_ScreenState extends ConsumerState<Home_Body_Screen> {
                   await ref.read(locationServiceProvider).fetchAndSetLocation();
                 },
               color: kBlue,
+              backgroundColor: kWhite,
               child: shopListAsyncValue.when(data: (shops) {
                 return ListView.builder(
                     itemCount: shops.length,

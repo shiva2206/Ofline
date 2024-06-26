@@ -80,4 +80,9 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.0"
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'com.google.firebase:firebase-auth:23.0.0' // Add this line
+    implementation 'com.google.android.gms:play-services-auth:21.2.0' // Add this line
+}

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ofline_app/screens/FavouriteScreen/viewModel/favoriteViewModel.dart';
-import 'package:ofline_app/screens/ShopScreen/shops/View/shopCardView.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../auth/View/authView.dart';
@@ -10,8 +7,14 @@ import '../../../utility/Widgets/appBar/View/aapbar.dart';
 import '../../../utility/Widgets/drawer/View/about.dart';
 import '../../ShopScreen/shops/View/shopView.dart';
 
+class Favourite_Screen extends StatefulWidget {
+  const Favourite_Screen({super.key});
 
-class Favourite_Screen extends ConsumerWidget {
+  @override
+  State<Favourite_Screen> createState() => _Favourite_ScreenState();
+}
+
+class _Favourite_ScreenState extends State<Favourite_Screen> {
   final bool _isEnabled = false;
 
   // var loc = const Home_Body_Screen();
@@ -19,11 +22,9 @@ class Favourite_Screen extends ConsumerWidget {
   get address => null;
 
   @override
-  Widget build(BuildContext context,WidgetRef ref) {
+  Widget build(BuildContext context) {
     var mqw = MediaQuery.of(context).size.width;
     var mqh = MediaQuery.of(context).size.height;
-
-    final favoriteShopListAsyncValue = ref.watch(favoritesStreamProvider);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: DefaultTabController(
@@ -197,18 +198,8 @@ class Favourite_Screen extends ConsumerWidget {
                       fontWeight: FontWeight.w700,
                       fontSize: 18,
                       color: kBlue))),
-          body: favoriteShopListAsyncValue.when(data: (shops) {
-              return ListView.builder(
-                  itemCount: shops.length,
-                  itemBuilder: (BuildContext context, int index
-                      ) {
-                    final shop = shops[index];
-                    return ShopCard(key:ValueKey(shop.id),shop: shop, mqh: mqh, mqw: mqw); });
-            }, error: (error, stackTrace) {
-              return Center(child: Text('Error: $error'));
-            }, loading: () {
-              return const CircularProgressIndicator(color: Colors.transparent);
-            }
+          body: const Column(
+            children: [],
           ),
         ),
       ),

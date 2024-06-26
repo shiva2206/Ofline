@@ -24,10 +24,11 @@ class ShopRepository {
         if(latitude!=null && longitude!=null){
           shop.distance = calculateDistanceInKm(latitude, longitude, shop.latitude, shop.longitude);
           shop.distanceText = formatDistance(shop.distance);
-          print("_________________________SHiba");
+        
         }
-        print(latitude==null);
-        print("katitude");
+      
+   
+         if(!shop.isActivated) continue;
         if(shop.shop_name.toLowerCase().startsWith(searchQuery ?? "")){
           shops.add(shop);
           continue;

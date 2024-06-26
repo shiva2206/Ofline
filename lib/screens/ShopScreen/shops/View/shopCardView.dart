@@ -3,10 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ofline_app/screens/ShopScreen/products/View/productView.dart';
+import 'package:ofline_app/screens/ShopScreen/shops/Model/shopModel.dart';
 import 'package:ofline_app/utility/Constants/color.dart';
 import 'package:ofline_app/utility/Location/Model/locationModel.dart';
 import 'package:ofline_app/utility/Location/ViewModel/locationViewModel.dart';
-
+import 'package:intl/intl.dart' as intl;
 class ShopCard extends ConsumerStatefulWidget {
   ShopCard({required super.key,required this.shop,required this.mqh,required this.mqw});
   final shop;
@@ -17,6 +18,7 @@ class ShopCard extends ConsumerStatefulWidget {
 
 class _ShopCardState extends ConsumerState<ShopCard> {
   
+
   int _favNumber = 0;
   bool _favourite = false;
  
@@ -31,7 +33,7 @@ class _ShopCardState extends ConsumerState<ShopCard> {
         .doc(customerId)
         .collection('Favorite')
         .doc(shopId)
-        .set({
+        .update({
       'fav_shop': shopId // Optional: Add other fields as necessary
     });
     print("Shop added to favorites!");
@@ -56,9 +58,9 @@ Future<void> removeShopFromFavorites(String shopId) async {
   }
 }
 
-  Future<void> updateFavCount(String shopId, int newFavCount) async {
+  Future<void> updateFavCount(ShopModel shop, int newFavCount) async {
     try {
-      DocumentReference shopRef = _firestore.collection('Shop').doc(shopId);
+      DocumentReference shopRef = _firestore.collection('Shop').doc(shop.id);
 
       await shopRef.update({'fav_count': newFavCount});
 
@@ -70,19 +72,19 @@ Future<void> removeShopFromFavorites(String shopId) async {
   
   }
   
-  Future<void> updateViewCount(String shopId, int newViewCount) async {
-    try {
-      DocumentReference shopRef = _firestore.collection('Shop').doc(shopId);
+  // Future<void> updateViewCount(ShopModel shop, int newViewCount) async {
+  //   try {
+  //     DocumentReference shopRef = _firestore.collection('Shop').doc(shop.id);
 
-      // await shopRef.update({'views': shopRef.get()!.data as int + 1});
+  //     await shopRef.update({'views': newViewCount});
 
-      print("Views count updated successfully");
-    } catch (e) {
-      print("Error updating Views count: $e");
-      throw e; // or handle error appropriately
-    }
+  //     print("Views count updated successfully");
+  //   } catch (e) {
+  //     print("Error updating Views count: $e");
+  //     throw e; // or handle error appropriately
+  //   }
   
-  }
+  // }
   // void _favInc() {
   //   updateFavCount(shopId, newFavCount)
   //   setState(() {
@@ -94,6 +96,37 @@ Future<void> removeShopFromFavorites(String shopId) async {
   //     _favNumber--;
   //   });
   // }
+
+
+void storeDateInFirestore() async{
+  // Get the current date
+  DateTime now = DateTime.now();
+
+  // Extract the date part (year, month, day) and create a new DateTime object
+  DateTime onlyDate = DateTime(now.year, now.month, now.day);
+
+  // Format the date as a string
+  String formattedDate = intl.DateFormat('yyyy-MM-dd').format(onlyDate);
+
+  // Store the formatted date string in Firestore
+  if(widget.shop.date == null || widget.shop.date != formattedDate){
+      await FirebaseFirestore.instance.collection('Shop').doc(widget.shop.id).update({
+    'date': formattedDate,
+    'views' :0
+  }).then((value) {
+    print("Date Added");
+  }).catchError((error) {
+    print("Failed to add date: $error");
+  });
+  }
+  
+}
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    storeDateInFirestore();
+  }
   @override
   Widget build(BuildContext context) {
     //  widget.shop.fav_count = 10;
@@ -134,13 +167,13 @@ Future<void> removeShopFromFavorites(String shopId) async {
                                     topRight: Radius.circular(20.5)),
                                 child: GestureDetector(
                                   onTap: () {
-                                    updateViewCount(widget.shop.id, 10);
+                                    // updateViewCount(widget.shop, 10);
                                     Navigator.of(context, rootNavigator: true)
                                         .push(MaterialPageRoute(
                                       maintainState: true,
                                       builder: (context) =>
                                           
-                                           Product_Screen(shopId: widget.shop.id, startingYear: widget.shop.startingYear,),
+                                           Product_Screen(shop: widget.shop, startingYear: widget.shop.startingYear,),
                                     ));
                                   },
                                   child: Image.network(
@@ -180,7 +213,7 @@ Future<void> removeShopFromFavorites(String shopId) async {
                                                 setState(() {
                                                   isActive = false;
                                                 });
-                                                updateFavCount(widget.shop.id, widget.shop.fav_count - 1);
+                                                updateFavCount(widget.shop, widget.shop.fav_count - 1);
                                                 removeShopFromFavorites(widget.shop.id);
                                                 setState(() {
                                                   _favourite = false;
@@ -198,7 +231,7 @@ Future<void> removeShopFromFavorites(String shopId) async {
                                                 setState(() {
                                                   isActive = false;
                                                 });
-                                                 updateFavCount(widget.shop.id, widget.shop.fav_count + 1);
+                                                 updateFavCount(widget.shop, widget.shop.fav_count + 1);
                                                   await addShopToFavorites(widget.shop.id);
                                                 setState(() {
                                                   _favourite = true;

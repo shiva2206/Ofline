@@ -7,6 +7,7 @@ class ProductModel {
   final String product_image;
   final Map<String, dynamic> sizeVariants;
   final bool inStock;
+  final bool isVeg;
   final String sub_category;
 
   ProductModel(
@@ -15,6 +16,7 @@ class ProductModel {
       required this.product_image,
       required this.sizeVariants,
       required this.inStock,
+      required this.isVeg,
       required this.sub_category});
 
   factory ProductModel.fromFirestore(DocumentSnapshot doc) {
@@ -25,6 +27,7 @@ class ProductModel {
         product_image: data['productImageLink'],
         sizeVariants: data['sizeVariant'] ?? {"Regular": 100} as Map<String, dynamic>,
         inStock: data['inStock'],
+        isVeg: data['isVeg'],
         sub_category: data['sub_category']
     );
   }
@@ -37,6 +40,7 @@ class ProductModel {
         product_image: data['productImageLink'],
         sizeVariants: data['sizeVariant'],
         inStock: data['inStock'],
+        isVeg: data['isVeg'],
         sub_category: data['sub_category']);
   }
 }

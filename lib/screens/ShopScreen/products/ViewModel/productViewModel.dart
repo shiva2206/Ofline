@@ -15,17 +15,11 @@ class ProductFirebase {
           .where('product_name', isLessThanOrEqualTo: searchText + '\uf8ff');
     }
 
-
-
     return query.snapshots().map((snapshot) {
-
       return snapshot.docs.map((doc) => ProductModel.fromFirestore(doc)).toList();
     });
   }
 }
-
-
-
 
 // The repository provider does not need shopId or searchText as it doesn't depend on them
 final productRepositoryProvider = Provider<ProductFirebase>((ref) {

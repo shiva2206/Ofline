@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ofline_app/utility/Location/ViewModel/locationViewModel.dart';
 
 import '../utility/Constants/color.dart';
 import 'FavouriteScreen/View/favouriteView.dart';
@@ -6,22 +8,29 @@ import 'HistoryScreen/View/historyView.dart';
 import 'ShopScreen/shops/View/shopView.dart';
 
 
-class BnbLessScreen extends StatefulWidget {
+class BnbLessScreen extends ConsumerStatefulWidget {
   const BnbLessScreen({super.key});
 
   @override
-  State<BnbLessScreen> createState() => _BnbLessScreenState();
+  ConsumerState<BnbLessScreen> createState() => _BnbLessScreenState();
 }
 
-class _BnbLessScreenState extends State<BnbLessScreen> {
+class _BnbLessScreenState extends ConsumerState<BnbLessScreen> {
   int myIndex = 0;
 
   List<Widget> bnbScreen = [
     const Home_Body_Screen(),
-     Favourite_Screen(),
+    const Favourite_Screen(),
     const History_Screen()
   ];
-
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+      final locationService = ref.read(locationServiceProvider);
+    locationService.fetchAndSetLocation();
+  
+  }
   @override
   Widget build(BuildContext context) {
     var mqh = MediaQuery.of(context).size.height;

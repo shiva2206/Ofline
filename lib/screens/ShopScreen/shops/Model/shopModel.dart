@@ -11,8 +11,11 @@ class ShopModel {
   final double latitude;
   final double longitude;
   final String startingYear;
+  final String date;
   final int views;
+
   final int fav_count;
+  final int live_view;
   final bool isActivated;
 
   double distance = 0.0;
@@ -29,7 +32,9 @@ class ShopModel {
     required this.startingYear,
     required this.fav_count,
     required this.views,
-    required this.isActivated
+    required this.isActivated,
+    required this.live_view,
+    required this.date
   });
 
   factory ShopModel.fromFirestore(DocumentSnapshot doc) {
@@ -46,7 +51,9 @@ class ShopModel {
       longitude: geopoint.longitude,
       fav_count: data['fav_count'],
       views: data['views'],
-      isActivated: data['isActivated']
+      isActivated: data['isActivated'],
+      live_view: data['live_view'],
+      date: data['date'] ?? ""
     );
   }
 }
