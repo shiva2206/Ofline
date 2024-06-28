@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,7 +25,7 @@ void main() async {
       statusBarBrightness: Brightness.dark,
       systemNavigationBarColor: kWhite,
       systemNavigationBarIconBrightness: Brightness.dark));
-  runApp(const ProviderScope(child: Ofline()));
+  runApp(ProviderScope(child: MaterialApp(home: MyHomePage())));
 }
 class Ofline extends ConsumerStatefulWidget {
   const Ofline({super.key});
@@ -59,6 +61,55 @@ class _OflineState extends ConsumerState<Ofline> {
           // AuthenticationPage(),
         ),
 
+      ),
+    );
+  }
+}
+
+
+
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  static const platform = MethodChannel('com.example.app/share');
+  String _imageFilePath = '';
+
+  @override
+  void initState() {
+    super.initState();
+    platform.setMethodCallHandler(_handleMethod);
+  }
+
+  Future<dynamic> _handleMethod(MethodCall call) async {
+    switch (call.method) {
+      case 'receiveImage':
+        setState(() {
+          _imageFilePath = call.arguments;
+        });
+        break;
+      default:
+        print('Unknown method ${call.method}');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Image Receiver'),
+      ),
+      body: Center(
+        child: _imageFilePath.isEmpty
+            ? Text('Waiting for image...')
+            : Image.file(
+                File(_imageFilePath),
+                errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                  return Text('Failed to load image: $_imageFilePath');
+                },
+              ),
       ),
     );
   }
