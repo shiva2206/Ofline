@@ -9,9 +9,10 @@ import 'package:ofline_app/utility/Location/Model/locationModel.dart';
 import 'package:ofline_app/utility/Location/ViewModel/locationViewModel.dart';
 import 'package:intl/intl.dart' as intl;
 class ShopCard extends ConsumerStatefulWidget {
-  ShopCard({required super.key,required this.shop,required this.mqh,required this.mqw});
+  ShopCard({required super.key,required this.shop,required this.mqh,required this.mqw,required this.isFavourite});
   final shop;
   final mqh,mqw;
+  final bool isFavourite;
   @override
   ConsumerState<ShopCard> createState() => _ShopCardState();
 }
@@ -19,23 +20,38 @@ class ShopCard extends ConsumerStatefulWidget {
 class _ShopCardState extends ConsumerState<ShopCard> {
   
 
-  int _favNumber = 0;
-  bool _favourite = false;
+ 
  
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   
-  Future<void> addShopToFavorites(String shopId) async {
+Future<void> addShopToFavorites(String shopId) async {
   final firestore = FirebaseFirestore.instance;
   final customerId = FirebaseAuth.instance.currentUser!.uid;
+
   try {
-    await firestore
+    // Check if the customer document exists in 'Customer/Favorite'
+    final customerDocRef = firestore
         .collection('Customer')
         .doc(customerId)
-        .collection('Favorite')
-        .doc(shopId)
-        .update({
-      'fav_shop': shopId // Optional: Add other fields as necessary
-    });
+        .collection('Favourite')
+        .doc(customerId);
+
+    final customerDoc = await customerDocRef.get();
+
+    if (!customerDoc.exists) {
+     
+      await customerDocRef.set({
+        'fav_shop': [shopId],
+        
+      });
+    } else {
+      
+      await customerDocRef.update({
+        'fav_shop': FieldValue.arrayUnion([shopId]),
+       
+      });
+    }
+
     print("Shop added to favorites!");
   } catch (e) {
     print("Error adding shop to favorites: $e");
@@ -43,26 +59,33 @@ class _ShopCardState extends ConsumerState<ShopCard> {
 }
 Future<void> removeShopFromFavorites(String shopId) async {
   final firestore = FirebaseFirestore.instance;
-  final customerId = FirebaseAuth.instance.currentUser!.uid ;
+  final customerId = FirebaseAuth.instance.currentUser!.uid;
 
   try {
-    await firestore
+    final shopDocRef = firestore
         .collection('Customer')
         .doc(customerId)
-        .collection('Favorites')
-        .doc(shopId)
-        .delete();
+        .collection('Favourite')
+        .doc(customerId);
+
+    final shopDoc = await shopDocRef.get();
+
+    if (!shopDoc.exists) {
+      print("Shop with ID $shopId does not exist in favorites.");
+      return; // Exit function if shop document doesn't exist
+    }
+
+    await shopDocRef.delete();
     print("Shop removed from favorites!");
   } catch (e) {
     print("Error removing shop from favorites: $e");
   }
 }
-
-  Future<void> updateFavCount(ShopModel shop, int newFavCount) async {
+  Future<void> updateFavCount(String shopId,bool toIncrement) async {
     try {
-      DocumentReference shopRef = _firestore.collection('Shop').doc(shop.id);
+      DocumentReference shopRef = _firestore.collection('Shop').doc(shopId);
 
-      await shopRef.update({'fav_count': newFavCount});
+      await shopRef.update({'fav_count':toIncrement? 1 : -1});
 
       print("fav_count updated successfully");
     } catch (e) {
@@ -207,16 +230,15 @@ void storeDateInFirestore() async{
                                 children: [
                                   Row(
                                     children: [
-                                      _favourite
+                                      widget.isFavourite
                                           ? GestureDetector(
                                               onTap: isActive? () {
                                                 setState(() {
                                                   isActive = false;
                                                 });
-                                                updateFavCount(widget.shop, widget.shop.fav_count - 1);
+                                                updateFavCount(widget.shop.id, false);
                                                 removeShopFromFavorites(widget.shop.id);
                                                 setState(() {
-                                                  _favourite = false;
                                                   isActive=true;
                                                 });
                                               }:null,
@@ -231,10 +253,9 @@ void storeDateInFirestore() async{
                                                 setState(() {
                                                   isActive = false;
                                                 });
-                                                 updateFavCount(widget.shop, widget.shop.fav_count + 1);
+                                                 updateFavCount(widget.shop.id, true);
                                                   await addShopToFavorites(widget.shop.id);
                                                 setState(() {
-                                                  _favourite = true;
                                                   isActive = true;
                                                 });
                                               }:null,

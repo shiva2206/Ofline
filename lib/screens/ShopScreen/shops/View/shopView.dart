@@ -1,7 +1,11 @@
+import 'dart:collection';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:location/location.dart';
+import 'package:ofline_app/screens/FavouriteScreen/viewModel/favoriteViewModel.dart';
 import 'package:ofline_app/screens/ShopScreen/shops/View/shopCardView.dart';
 import 'package:ofline_app/utility/Location/View/locationView.dart';
 import 'package:ofline_app/utility/Location/ViewModel/locationViewModel.dart';
@@ -36,23 +40,31 @@ class _Home_Body_ScreenState extends ConsumerState<Home_Body_Screen> {
     super.initState();
   
   }
+Future<HashSet<String>> fetchFavoriteShopIds() async {
+  final firestore = FirebaseFirestore.instance;
+  final customerId = FirebaseAuth.instance.currentUser!.uid;
 
+  try {
+    final shopIdsSnapshot = await firestore
+        .collection('Customer')
+        .doc(customerId)
+        .collection('Favorites')
+        .doc(customerId)
+        .get();
 
-  int _favNumber = 0;
-  bool _favourite = false;
-  void _favInc() {
-    setState(() {
-      _favNumber++;
-    });
+    if (!shopIdsSnapshot.exists) {
+      return HashSet(); // Return an empty HashSet if document doesn't exist
+    }
+
+    final List<dynamic> shopIdsList = shopIdsSnapshot['fav_shop'] ?? [];
+    final HashSet<String> shopIdsHashSet = HashSet.from(shopIdsList.map((e) => e.toString()));
+
+    return shopIdsHashSet;
+  } catch (e) {
+    print("Error fetching favorite shop IDs: $e");
+    return HashSet(); // Return an empty HashSet in case of error
   }
-  void _favDec() {
-    setState(() {
-      _favNumber--;
-    });
-  }
-
-
-
+}
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +72,7 @@ class _Home_Body_ScreenState extends ConsumerState<Home_Body_Screen> {
     var mqh = MediaQuery.of(context).size.height;
     
     final shopListAsyncValue = ref.watch(shopListProvider(ref.watch(searchTextProvider)));
-    // final locate = ref.watch(loca);
+    final favShopListAsyncValue = ref.watch(favoriteShopIdsProvider);
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
@@ -76,13 +88,16 @@ class _Home_Body_ScreenState extends ConsumerState<Home_Body_Screen> {
                 },
               color: kBlue,
               backgroundColor: kWhite,
-              child: shopListAsyncValue.when(data: (shops) {
-                return ListView.builder(
+              child: shopListAsyncValue.when(data: (shops){
+                return favShopListAsyncValue.when(data: (favShops){ return ListView.builder(
                     itemCount: shops.length,
                     itemBuilder: (BuildContext context, int index
                         ) {
                       final shop = shops[index];
-                      return ShopCard(key:ValueKey(shop.id),shop: shop, mqh: mqh, mqw: mqw); });
+                      return ShopCard(key:ValueKey(shop.id),shop: shop, mqh: mqh, mqw: mqw,isFavourite: favShops.contains(shop.id),); });}, error: (error, stackTrace) {
+                return Center(child: Text('Error: $error'));
+              }, loading: (){return const CircularProgressIndicator(color: Colors.transparent);});
+               
               }, error: (error, stackTrace) {
                 return Center(child: Text('Error: $error'));
               }, loading: () {

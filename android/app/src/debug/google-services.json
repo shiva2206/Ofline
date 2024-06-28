@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "411318694896-c955pd5pa6uram0hl2g10bapu9hkpq4h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.co_ofline_app.co_ofline",
+            "certificate_hash": "1f7ec1d29f319b47e4de4c7036abe623e947de2a"
+          }
+        },
+        {
           "client_id": "411318694896-rm0lsf8hmsa8ndibrlh6tj17cl68dgn2.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -56,6 +64,14 @@
           "android_info": {
             "package_name": "com.ofline_marketplace.ofline_app",
             "certificate_hash": "89661e5ed1d7012070b0b87f17ba87797aac2290"
+          }
+        },
+        {
+          "client_id": "411318694896-lfjbku0isr3g198ehron65aivfbj2sts.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ofline_marketplace.ofline_app",
+            "certificate_hash": "1f7ec1d29f319b47e4de4c7036abe623e947de2a"
           }
         },
         {

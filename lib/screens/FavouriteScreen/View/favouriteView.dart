@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ofline_app/screens/FavouriteScreen/viewModel/favoriteViewModel.dart';
+import 'package:ofline_app/screens/ShopScreen/shops/View/shopCardView.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../auth/View/authView.dart';
@@ -7,14 +10,14 @@ import '../../../utility/Widgets/appBar/View/aapbar.dart';
 import '../../../utility/Widgets/drawer/View/about.dart';
 import '../../ShopScreen/shops/View/shopView.dart';
 
-class Favourite_Screen extends StatefulWidget {
+class Favourite_Screen extends ConsumerStatefulWidget {
   const Favourite_Screen({super.key});
 
   @override
-  State<Favourite_Screen> createState() => _Favourite_ScreenState();
+  ConsumerState<Favourite_Screen> createState() => _Favourite_ScreenState();
 }
 
-class _Favourite_ScreenState extends State<Favourite_Screen> {
+class _Favourite_ScreenState extends ConsumerState<Favourite_Screen> {
   final bool _isEnabled = false;
 
   // var loc = const Home_Body_Screen();
@@ -25,6 +28,7 @@ class _Favourite_ScreenState extends State<Favourite_Screen> {
   Widget build(BuildContext context) {
     var mqw = MediaQuery.of(context).size.width;
     var mqh = MediaQuery.of(context).size.height;
+    final favShopListAsyncValue = ref.watch(favoriteShopsProvider);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: DefaultTabController(
@@ -198,11 +202,19 @@ class _Favourite_ScreenState extends State<Favourite_Screen> {
                       fontWeight: FontWeight.w700,
                       fontSize: 18,
                       color: kBlue))),
-          body: const Column(
-            children: [],
+          body: favShopListAsyncValue.when(data: (favShops){ 
+            
+            return ListView.builder(
+                    itemCount: favShops.length,
+                    itemBuilder: (BuildContext context, int index
+                        ) {
+                      final shop = favShops[index];
+                      return ShopCard(key:ValueKey(shop.id),shop: shop, mqh: mqh, mqw: mqw,isFavourite: true,); });}, error: (error, stackTrace) {
+                return Center(child: Text('Error: $error'));
+              }, loading: (){return const CircularProgressIndicator(color: Colors.transparent);})
           ),
         ),
-      ),
+    
     );
   }
 }
