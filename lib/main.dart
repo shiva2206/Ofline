@@ -66,8 +66,6 @@ class _OflineState extends ConsumerState<Ofline> {
   }
 }
 
-
-
 class MyHomePage extends StatefulWidget {
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -76,6 +74,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   static const platform = MethodChannel('com.example.app/share');
   String _imageFilePath = '';
+  String _sourceApp = '';
 
   @override
   void initState() {
@@ -83,11 +82,15 @@ class _MyHomePageState extends State<MyHomePage> {
     platform.setMethodCallHandler(_handleMethod);
   }
 
-  Future<dynamic> _handleMethod(MethodCall call) async {
+  Future<void> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case 'receiveImage':
+        final Map<dynamic, dynamic> arguments = call.arguments;
+        print("Chenck---------------------");
+        print(arguments);
         setState(() {
-          _imageFilePath = call.arguments;
+          _imageFilePath = arguments['filePath'] ?? '';
+          _sourceApp = arguments['sourceApp'] ?? 'Unknown';
         });
         break;
       default:
@@ -101,15 +104,25 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text('Image Receiver'),
       ),
-      body: Center(
-        child: _imageFilePath.isEmpty
-            ? Text('Waiting for image...')
-            : Image.file(
-                File(_imageFilePath),
-                errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                  return Text('Failed to load image: $_imageFilePath');
-                },
-              ),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            _imageFilePath.isEmpty
+                ? Text('Waiting for image...')
+                : Image.file(
+                    File(_imageFilePath),
+                    errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                      return Text('Failed to load image: $_imageFilePath');
+                    },
+                  ),
+            SizedBox(height: 20),
+            Text(
+              'Received from: ${_sourceApp == "com.google.android.apps.nbu.paisa.user" ? "GPay" : _sourceApp}',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
       ),
     );
   }
