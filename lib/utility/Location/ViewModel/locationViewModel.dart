@@ -1,59 +1,12 @@
-// import 'dart:ffi';
-
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:location/location.dart';
-
-
-// class LocationService {
-//   final Location _location = Location();
-
-//   Stream<LocationData?> getLocationStream() async* {
-//     bool serviceEnabled = await _location.serviceEnabled();
-//     if (!serviceEnabled) {
-//       serviceEnabled = await _location.requestService();
-//       if (!serviceEnabled) {
-//         yield null;
-//         return;
-//       }
-//     }
-
-//     PermissionStatus permissionGranted = await _location.hasPermission();
-//     if (permissionGranted == PermissionStatus.denied) {
-//       permissionGranted = await _location.requestPermission();
-//       if (permissionGranted != PermissionStatus.granted) {
-//         yield null;
-//         return;
-//       }
-//     }
-//     print(_location.onLocationChanged);
-//     print("shiva prasad");
-//     yield* _location.onLocationChanged;
-//   }
-// }
-
-
-// final locationServiceProvider = Provider<LocationService>((ref) {
-//   return LocationService();
-// });
-
-// final locationStreamProvider = StreamProvider<LocationData?>((ref) {
-//   final locationService = ref.watch(locationServiceProvider);
-//   return locationService.getLocationStream();
-// });
-
-
-// final locationProvider = Provider<List<double>>((ref){
-//   return [0.0,0.0];
-// });
-
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:ofline_app/utility/Location/Model/locationModel.dart';
 
-
 class LocationService {
   final Ref ref;
+
   LocationService({required this.ref});
 
   Future<void> fetchAndSetLocation() async {
@@ -81,7 +34,11 @@ class LocationService {
       latitude: locationData.latitude!,
       longitude: locationData.longitude!,
     );
+
+
   }
+
+
 }
 
 final locationServiceProvider = Provider<LocationService>((ref) {
@@ -90,4 +47,14 @@ final locationServiceProvider = Provider<LocationService>((ref) {
 
 final locationProvider = StateProvider<UserLocation?>((ref) {
   return null; // Initial state is null
+});
+
+final startPointProvider = Provider.family<LatLng, UserLocation>((ref, coor) {
+  // Define your start geopoint
+  return LatLng(coor.latitude, coor.longitude);
+});
+
+final endPointProvider = Provider.family<LatLng, UserLocation>((ref, coor) {
+  // Define your end geopoint
+  return LatLng(coor.latitude, coor.longitude);
 });

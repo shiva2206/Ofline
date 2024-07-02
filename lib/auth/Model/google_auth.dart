@@ -26,6 +26,7 @@ class AuthMethods {
 
 
     User? userDetails = result.user;
+    print(userDetails);
 
     if (result != null) {
       Map<String, dynamic> userInfoMap = {
@@ -33,6 +34,7 @@ class AuthMethods {
         "name": userDetails.displayName,
         "imgUrl": userDetails.photoURL,
         "id": userDetails.uid,
+        "fav_shop": [],
       };
 
       await DatabaseMethod()

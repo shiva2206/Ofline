@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../screens/BNB.dart';
 import '../../utility/Constants/color.dart';
 import '../../utility/Constants/text.dart';
+import '../../utility/Location/ViewModel/locationViewModel.dart';
 import '../Model/google_auth.dart';
 
 
@@ -28,6 +29,8 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
     // TODO: implement initState
     // lokation.getLatLong();
     super.initState();
+    final locationService = ref.read(locationServiceProvider);
+    locationService.fetchAndSetLocation();
   }
 
   @override
@@ -65,23 +68,20 @@ class _AuthenticationPageState extends ConsumerState<AuthenticationPage> {
             ),
             Padding(
               padding: const EdgeInsets.all(15.0),
-              child: InkWell(
-                onTap: () async {
-                  AuthMethods().signInWithGoogle(context);
-                },
-                child: SizedBox(
-                    height: mqh * 70 / 2340,
-                    width: mqw * 66.5 / 1080,
-                    child: const Image(
-                        image: AssetImage('images/Google icon.png'))),
-              ),
+              child: SizedBox(
+                  height: mqh * 70 / 2340,
+                  width: mqw * 66.5 / 1080,
+                  child: const Image(
+                      image: AssetImage('images/Google icon.png'))),
             ),
             GestureDetector(
               onTap: () {
-                Navigator.of(context, rootNavigator: true).push(
-                    MaterialPageRoute(
-                        maintainState: true,
-                        builder: (context) => const BnbLessScreen()));
+                // Navigator.of(context, rootNavigator: true).push(
+                    // MaterialPageRoute(
+                    //     maintainState: true,
+                    //     builder: (context) => const BnbLessScreen()));
+                AuthMethods().signInWithGoogle(context);
+
               },
               child: Container(
                 height: mqh * 0.049,

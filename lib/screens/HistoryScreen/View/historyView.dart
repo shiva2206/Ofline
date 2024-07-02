@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:ofline_app/utility/Widgets/drawer/View/drawerView.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../auth/View/authView.dart';
 import '../../../utility/Constants/color.dart';
-import '../../../utility/Widgets/appBar/View/aapbar.dart';
-import '../../../utility/Widgets/drawer/View/about.dart';
+import '../../../utility/Widgets/appBar/View/appbar.dart';
+import '../../../utility/Widgets/drawer/View/aboutView.dart';
 
 class History_Screen extends StatefulWidget {
   const History_Screen({super.key});
@@ -50,167 +51,7 @@ class _History_ScreenState extends State<History_Screen> {
                   color: kBlue, fontWeight: FontWeight.w700, fontSize: 18)),
         ),
         backgroundColor: kWhite,
-        drawer: Drawer(
-          width: mqw * 630 / 1080,
-          backgroundColor: kWhite,
-          elevation: 0,
-          shadowColor: Colors.transparent,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: mqw * 10 / 1080),
-            child: ListView(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: mqw * 48 / 1080),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: mqw * 149 / 1080,
-                        height: mqh * 90 / 2340,
-                      ),
-                      const Text(
-                        'Ofline',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 20,
-                            color: kBlue),
-                      ),
-                      SizedBox(
-                        height: mqh * 160 / 2340,
-                      ),
-                    ],
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(
-                    Icons.location_on_outlined,
-                    color: kGrey,
-                    size: 20.5,
-                  ),
-                  title: Text(
-                    '$address',
-                    style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: kGrey),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () async {
-                    const urlPreview =
-                        'hhttps://play.google.com/store/apps/details?id=in.liiia.user';
-
-                    await Share.share('Ofline : Local Market \n$urlPreview');
-                  },
-                  child: ListTile(
-                    leading: Icon(
-                      Icons.share,
-                      color: kGrey.withOpacity(0.60),
-                      size: 19,
-                    ),
-                    title: const Text(
-                      'Share App',
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: kGrey),
-                    ),
-                  ),
-                ),
-                const ListTile(
-                  leading: Icon(
-                    Icons.youtube_searched_for,
-                    color: kGrey,
-                    size: 20.5,
-                  ),
-                  title: Text(
-                    'YouTube',
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: kGrey),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    launch('mailto:contact@liaa.in');
-                  },
-                  child: const ListTile(
-                    leading: Icon(
-                      Icons.mail_outline_outlined,
-                      color: kGrey,
-                      size: 20.5,
-                    ),
-                    title: Text(
-                      'Contact',
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: kGrey),
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const AboutScreen()));
-                  },
-                  child: const ListTile(
-                    leading: Icon(
-                      Icons.info_outline_rounded,
-                      color: kGrey,
-                      size: 20,
-                    ),
-                    title: Text(
-                      'About',
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: kGrey),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: mqh * 110 / 2340,
-                ),
-                Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: mqw * 180 / 1080),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const AuthenticationPage()));
-                    },
-                    child: Container(
-                      height: mqh * 0.045,
-                      width: mqw * 160 / 1080,
-                      decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(27)),
-                          color: kBlue),
-                      child: const Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Center(
-                          child: Text(
-                            'Log Out',
-                            style: TextStyle(
-                              color: kWhite,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        drawer: CustomDrawer(mqh: mqh, mqw: mqw,),
         body: Column(
           children: [
             Expanded(
