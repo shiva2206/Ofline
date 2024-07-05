@@ -7,6 +7,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 
 import 'package:ofline_app/screens/BNB.dart';
+import 'package:ofline_app/screens/ShopScreen/carts/CartView.dart';
+import 'package:ofline_app/screens/ShopScreen/products/View/productView.dart';
+import 'package:ofline_app/screens/ShopScreen/shops/Model/shopModel.dart';
 import 'package:ofline_app/utility/Constants/color.dart';
 import 'package:ofline_app/utility/Location/ViewModel/locationViewModel.dart';
 import 'auth/View/authView.dart';
@@ -65,7 +68,9 @@ class _OflineState extends ConsumerState<Ofline> {
                       return const AuthenticationPage();
                     }
                     else {
-                      return const BnbLessScreen();
+                      // return const BnbLessScreen();
+                      ShopModel sp = new ShopModel(id: "oMRTytXxid2EuJij2O8r", shop_name: "ok shine", shopImageLink: "", address: "", isOpen: true, latitude: 12, longitude: 80, startingYear: "1998", fav_count: 0, views:0, isActivated: true, live_view: 0, date: "12-3-2023");
+                      return Cartview(shop: sp, customerId: "z2hoSD4BzcNev0tSCmT3mQYnxPz2");
                     }
                   }
                   return const Center(child: CircularProgressIndicator(color: kBlue,));

@@ -4,7 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ofline_app/screens/ShopScreen/products/View/CartView.dart';
+import 'package:ofline_app/screens/ShopScreen/carts/CartView.dart';
+
 import 'package:ofline_app/screens/ShopScreen/products/ViewModel/productViewModel.dart';
 import 'package:ofline_app/utility/Widgets/animatedSearch/ViewModel/searchViewModel.dart';
 import '../../../../utility/Constants/color.dart';
