@@ -50,25 +50,26 @@ void UpdateItemCount(int index,int qty) async {
       }
 
       // Read the current array from the snapshot
-      List<CartItem> cartlist = List.from(snapshot.get('cart_items') ?? []);
+      List<Map<String,dynamic>> cartlist = List.from(snapshot.get('cart_items') ?? []);
       
       if (index < 0 || index >= cartlist.length) {
         throw Exception("Index out of bounds");
       }
 
-      // Assuming each element in the array is a map with a 'Count' key
-      CartItem item = cartlist[index];
+      
+      Map<String,dynamic> item = cartlist[index];
       
      
 
       // Increment the 'Count'
-      item.cart_product_qty += qty;
+      item['cart_product_qty'] += qty;
+      print("hell");
 
       // Replace the old item with the updated item
       cartlist[index] = item;
 
       // Update the document with the new array
-      // transaction.update(docRef, {'cart_items': cartlist as Map<String,dynamic>});
+      transaction.update(docRef, {'cart_items': cartlist });
     });
 
     print("Item count updated successfully.");
@@ -129,10 +130,69 @@ void UpdateItemCount(int index,int qty) async {
               right: mqw * 250 / 1080),
           child: GestureDetector(
             onTap: () {
-              showModalBottomSheet(
-                  context: context,
+              bottomSheet();
+            },
+            child: Container(
+              height: mqh * 0.049,
+              width: mqw * 400 / 1080,
+              decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10.5)),
+                  color: kBlue),
+              child: Padding(
+                  padding: EdgeInsets.all(mqw * 10 / 1080),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          cartmdel!.total_amount.toString(),
+                          textAlign: TextAlign.right,
+                          style: const TextStyle(
+                            color: kWhite,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Center(
+                        child: SizedBox(
+                          width: mqw * 100 / 1080,
+                          child: Icon(
+                            Icons.shopping_cart,
+                            color: kWhite,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          '₹' + cartmdel!.total_cart_item.toString(),
+                          textAlign: TextAlign.left,
+                          style: const TextStyle(
+                            color: kWhite,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )),
+            ),
+          )),
+    );
+ 
+      },
+    );
+  }
+  
+  void bottomSheet(){
+    var mqw = MediaQuery.of(context).size.width;
+    var mqh = MediaQuery.of(context).size.height;
+    showModalBottomSheet(
+                  context: context,          
                   builder: (BuildContext context) {
-                    return Container(
+                    return StatefulBuilder(builder: (BuildContext context, StateSetter setState){
+                      return Container(
                       width: double.infinity,
                       height: mqh * 1800 / 2340,
                       decoration: const BoxDecoration(
@@ -144,7 +204,7 @@ void UpdateItemCount(int index,int qty) async {
                         children: [
                           Padding(
                             padding: EdgeInsets.all(10.0),
-                            child: Text(widget.shop.shop_name.toTitleCase(),
+                            child: Text(widget.shop.shop_name.toTitleCase() + cartmdel!.total_amount.toString(),
                                 style: const TextStyle(
                                     color: kBlue,
                                     fontSize: 15.5,
@@ -260,6 +320,9 @@ void UpdateItemCount(int index,int qty) async {
                                                       InkWell(
                                                         onTap: () {
                                                           UpdateItemCount(index, -1);
+                                                          setState((){
+
+                                                          });
                                                           // setState(() {
                                                           //   print(
                                                           //       "Before increment: ${item.product_qty}");
@@ -289,7 +352,11 @@ void UpdateItemCount(int index,int qty) async {
                                                       ),
                                                       InkWell(
                                                         onTap: () {
+
                                                           UpdateItemCount(index, 1);
+                                                          setState((){
+
+                                                          });
                                                           // setState(() {
                                                           //   print("Before increment: ${item.product_qty}");
                                                           //   item.product_qty += 1;
@@ -452,59 +519,9 @@ void UpdateItemCount(int index,int qty) async {
                         ],
                       ),
                     );
-                  });
-            },
-            child: Container(
-              height: mqh * 0.049,
-              width: mqw * 400 / 1080,
-              decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10.5)),
-                  color: kBlue),
-              child: Padding(
-                  padding: EdgeInsets.all(mqw * 10 / 1080),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          '0',
-                          textAlign: TextAlign.right,
-                          style: const TextStyle(
-                            color: kWhite,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      Center(
-                        child: SizedBox(
-                          width: mqw * 100 / 1080,
-                          child: Icon(
-                            Icons.shopping_cart,
-                            color: kWhite,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          '₹0',
-                          textAlign: TextAlign.left,
-                          style: const TextStyle(
-                            color: kWhite,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  )),
-            ),
-          )),
-    );
- 
-      },
-    );
+                    });
+                  }
+                  );
   }
    
 }

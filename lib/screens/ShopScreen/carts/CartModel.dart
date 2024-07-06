@@ -10,6 +10,7 @@ class Cartmodel {
   final double gst;
   final double sgst;
   final double total_amount;
+  int total_cart_item;
 
   Cartmodel({
     required this.items,
@@ -19,6 +20,7 @@ class Cartmodel {
     required this.id, 
     required this.gst,
     required this.sgst,
+    required this.total_cart_item,
     required this.total_amount,
   });
 
@@ -32,7 +34,8 @@ class Cartmodel {
       shop_id: data['shop_id'],
       gst: data['tax']['gst'],
       sgst: data['tax']['state_tax'],
-      total_amount: data['total_amount'].toDouble()
+      total_amount: data['total_amount'].toDouble(),
+      total_cart_item: data['total_cart_item']
     );
   }
 }
