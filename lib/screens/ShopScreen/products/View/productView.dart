@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ofline_app/screens/ShopScreen/carts/CartView.dart';
+import 'package:ofline_app/screens/ShopScreen/carts/View/CartView.dart';
 
 import 'package:ofline_app/screens/ShopScreen/products/ViewModel/productViewModel.dart';
 import 'package:ofline_app/utility/Widgets/animatedSearch/ViewModel/searchViewModel.dart';
@@ -446,7 +446,7 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
                 })),
             Expanded(
               flex: 1,
-              child: Cartview(shop: widget.shop, customerId: user!,),
+              child: Cartview(shop: widget.shop, customerId: "z2hoSD4BzcNev0tSCmT3mQYnxPz2",),
             ),
           ],
         ),
