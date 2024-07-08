@@ -27,6 +27,7 @@ class _Home_Body_ScreenState extends ConsumerState<Home_Body_Screen> {
   @override
   void initState() {
     super.initState();
+  
   }
 
   Future<HashSet<String>> fetchFavoriteShopIds() async {

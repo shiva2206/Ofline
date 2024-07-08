@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ofline_app/screens/ShopScreen/carts/View/CartView.dart';
+import 'package:ofline_app/screens/ShopScreen/carts/View/CustomBottomSheet.dart';
 
 import 'package:ofline_app/screens/ShopScreen/products/ViewModel/productViewModel.dart';
 import 'package:ofline_app/utility/Widgets/animatedSearch/ViewModel/searchViewModel.dart';
@@ -17,9 +18,10 @@ import 'package:ofline_app/utility/Constants/string_extensions.dart';
 class Product_Screen extends ConsumerStatefulWidget {
   final ShopModel shop;
   final String startingYear;
+  bool toCart;
 
-  const Product_Screen(
-      {Key? key, required this.shop, required this.startingYear})
+  Product_Screen(
+      {Key? key, required this.shop, required this.startingYear,required this.toCart})
       : super(key: key);
 
   @override
@@ -37,6 +39,26 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
     super.initState();
      WidgetsBinding.instance.addObserver(this);
     updateCount();
+
+     if (widget.toCart) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => Custombottomsheet(
+            shop: widget.shop,
+            customerId: "z2hoSD4BzcNev0tSCmT3mQYnxPz2",
+          ),
+        ),
+      ).then((_) {
+        setState(() {
+          widget.toCart = false; // Reset the flag when returning from the Custombottomsheet screen
+        });
+      });
+    });
+  }
+    
+
+
 
   }
 
@@ -75,9 +97,14 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
       final DocumentReference shopRef = _firestore.collection('Shop').doc(widget.shop.id);
 
       await shopRef.update({'live_view': FieldValue.increment(1)});
+
+      
+
       await shopRef.update({'views': FieldValue.increment(1)});
 
       print("Views count updated successfully");
+
+
     } catch (e) {
       print("Error updating Views count: $e");
       throw e; // or handle error appropriately

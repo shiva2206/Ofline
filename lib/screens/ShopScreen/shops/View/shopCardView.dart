@@ -134,7 +134,7 @@ class _ShopCardState extends ConsumerState<ShopCard> {
                       MaterialPageRoute(
                         maintainState: true,
                         builder: (context) =>
-                            Product_Screen(shop: widget.shop, startingYear: widget.shop.startingYear),
+                            Product_Screen(shop: widget.shop, startingYear: widget.shop.startingYear,toCart: false,),
                       ),
                     );
                   },

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ofline_app/screens/ShopScreen/products/View/productView.dart';
+import 'package:ofline_app/screens/ShopScreen/shops/Model/shopModel.dart';
 import 'package:ofline_app/utility/Location/ViewModel/locationViewModel.dart';
 
 import '../utility/Constants/color.dart';
@@ -8,6 +10,17 @@ import 'FavouriteScreen/View/favouriteView.dart';
 import 'HistoryScreen/View/historyView.dart';
 import 'ShopScreen/shops/View/shopView.dart';
 
+
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+
+
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:uuid/uuid.dart';
 
 class BnbLessScreen extends ConsumerStatefulWidget {
   const BnbLessScreen({super.key});
@@ -18,7 +31,15 @@ class BnbLessScreen extends ConsumerStatefulWidget {
   ConsumerState<BnbLessScreen> createState() => _BnbLessScreenState();
 }
 
-class _BnbLessScreenState extends ConsumerState<BnbLessScreen> {
+class _BnbLessScreenState extends ConsumerState<BnbLessScreen> with WidgetsBindingObserver{
+
+  static const platform = MethodChannel('com.example.app/share');
+  String _imageFilePath = '';
+  String _sourceApp = '';
+  String _status = '';
+  String _extractedAmount = '';
+  String _extractedDateTime = '';
+
   int myIndex = 0;
 
   List<Widget> bnbScreen = [
@@ -26,12 +47,174 @@ class _BnbLessScreenState extends ConsumerState<BnbLessScreen> {
     const Favourite_Screen(),
     const History_Screen()
   ];
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+     WidgetsBinding.instance.addObserver(this);
+    print("----------init State---------");
+    platform.setMethodCallHandler(_handleMethod);
 
   }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+     WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+  
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+  
+   
+      
+
+     
+      if (state == AppLifecycleState.resumed) {
+       
+        print("--------resumed-------");
+
+        platform.setMethodCallHandler(_handleMethod);
+      }
+  }
+
+  
+  Future<void> _handleMethod(MethodCall call) async {
+    print("============world======");
+    switch (call.method) {
+      case 'receiveImage':
+        final Map<dynamic, dynamic> arguments = call.arguments;
+        setState(() {
+          _imageFilePath = arguments['filePath'] ?? '';
+          _sourceApp = arguments['sourceApp'] ?? 'Unknown';
+        });
+        uploadImageAndSaveLink();
+        print("-----------cominnnnggg");
+        break;
+      default:
+        print('Unknown method ${call.method}');
+    }
+  }
+
+  Future<void> _extractTextFromImage() async {
+    if (_imageFilePath.isEmpty) return;
+
+    final inputImage = InputImage.fromFilePath(_imageFilePath);
+    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    final recognizedText = await textRecognizer.processImage(inputImage);
+
+    String fullText = '';
+    for (TextBlock block in recognizedText.blocks) {
+      for (TextLine line in block.lines) {
+        fullText += line.text + '\n';
+      }
+    }
+
+    print("--------------------");
+    print(fullText);
+    print("--------------------");
+
+    _status = _checkPaymentStatus(fullText);
+    _extractedAmount = _extractAmount(fullText);
+    _extractedDateTime = _extractDateTime(fullText);
+
+    setState(() {});
+
+    textRecognizer.close();
+  }
+
+  String _checkPaymentStatus(String text) {
+    final successKeywords = ['Successful', 'paid', 'completed'];
+    for (var keyword in successKeywords) {
+      if (text.toLowerCase().contains(keyword.toLowerCase())) {
+        return 'Yes';
+      }
+    }
+    return 'No';
+  }
+
+ String _extractAmount(String text) {
+  // Regular expression to match currency amounts without relying on the currency symbol
+  final regex = RegExp(r'[\₹\Rs\$.]*\s?\d+(,\d{3})*(\.\d{1,2})?');
+  final match = regex.firstMatch(text);
+  if (match != null) {
+    String recognizedText = match.group(0) ?? '';
+
+    // Post-processing to handle common OCR misrecognitions, assuming '7' is often misrecognized for '₹'
+    recognizedText = recognizedText.replaceAll('7', '₹');
+
+    return recognizedText;
+  }
+  return 'Amount not found';
+}
+
+
+ String _extractDateTime(String text) {
+  final regex = RegExp(
+    r'(\d{1,2}\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{2,4}),?\s?(\d{1,2}:\d{2}\s(?:AM|PM)?)?|(\d{1,2}:\d{2}\s(?:AM|PM))\s(?:on)?\s(\d{1,2}\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{2,4})',
+    caseSensitive: false
+  );
+  final match = regex.firstMatch(text);
+  if (match != null) {
+    // Build the date time string from parts
+    String datePart = match.group(1) ?? match.group(4) ?? '';
+    String timePart = match.group(2) ?? match.group(3) ?? '';
+    return (datePart + ' ' + timePart).trim();
+  }
+  return 'Date not found';
+}
+
+
+  Future<void> uploadImageAndSaveLink() async {
+    try {
+      String uniqueId = Uuid().v4();
+      File imageFile = File(_imageFilePath);
+
+      // Upload to Firebase Storage
+      FirebaseStorage storage = FirebaseStorage.instance;
+      Reference ref = storage.ref().child('paymentImage');
+      UploadTask uploadTask = ref.putFile(imageFile);
+      TaskSnapshot taskSnapshot = await uploadTask;
+      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+
+        // Update Firestore
+      String customerId = 'z2hoSD4BzcNev0tSCmT3mQYnxPz2'; // Replace with your actual customer ID
+      String shopId = 'oMRTytXxid2EuJij2O8r'; // Replace with your actual shop ID
+      
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+       DocumentSnapshot doc = await firestore.collection("Shop").doc(shopId).get();
+        ShopModel shop = ShopModel.fromFirestore(doc);
+
+    
+
+      QuerySnapshot query = await firestore
+          .collection('Cart')
+          .where('customer_id', isEqualTo: customerId)
+          .where('shop_id', isEqualTo: shopId)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        String cartId = query.docs.first.id;
+        await firestore
+            .collection('Cart')
+            .doc(cartId)
+            .update({'cart_payment_image': downloadUrl});
+
+       
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => Product_Screen(shop: shop, startingYear: shop.startingYear,toCart:true)));
+      } else {
+        print('No matching cart found');
+      }
+    } catch (e) {
+      print('Error uploading image: $e');
+    }
+  }
+
+ 
   @override
   Widget build(BuildContext context) {
     var mqh = MediaQuery.of(context).size.height;
