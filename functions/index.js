@@ -1,19 +1,27 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
 
-const {onRequest} = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
+admin.initializeApp();
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+exports.resetShopViews = functions.region("asia-south1")
+    .pubsub.schedule("every day 18:30")
+    .timeZone("Asia/Kolkata")
+    .onRun(async (context) => {
+      const db = admin.firestore();
+      const shopsRef = db.collection("Shop");
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+      try {
+        const snapshot = await shopsRef.get();
+        const batch = db.batch();
+
+        snapshot.forEach((doc) => {
+          const shopRef = shopsRef.doc(doc.id);
+          batch.update(shopRef, {views: 0});
+        });
+
+        await batch.commit();
+        console.log("All shop views reset to 0 successfully.");
+      } catch (error) {
+        console.error("Error resetting shop views:", error);
+      }
+    });
