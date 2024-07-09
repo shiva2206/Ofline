@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ofline_app/screens/ShopScreen/carts/Model/CartModel.dart';
 import 'package:ofline_app/screens/ShopScreen/products/View/productView.dart';
 import 'package:ofline_app/screens/ShopScreen/shops/Model/shopModel.dart';
 import 'package:ofline_app/utility/Location/ViewModel/locationViewModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utility/Constants/color.dart';
 import 'FavouriteScreen/View/favouriteView.dart';
@@ -176,14 +178,26 @@ class _BnbLessScreenState extends ConsumerState<BnbLessScreen> with WidgetsBindi
 
       // Upload to Firebase Storage
       FirebaseStorage storage = FirebaseStorage.instance;
-      Reference ref = storage.ref().child('paymentImage');
+      Reference ref = storage.ref().child('paymentImage/${uniqueId}');
       UploadTask uploadTask = ref.putFile(imageFile);
       TaskSnapshot taskSnapshot = await uploadTask;
       String downloadUrl = await taskSnapshot.ref.getDownloadURL();
 
         // Update Firestore
       String customerId = 'z2hoSD4BzcNev0tSCmT3mQYnxPz2'; // Replace with your actual customer ID
-      String shopId = 'oMRTytXxid2EuJij2O8r'; // Replace with your actual shop ID
+
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? shopId = await prefs.getString("shopId");
+      // if(shopId==null){
+      //       ScaffoldMessenger.of(context).showSnackBar(
+      //         SnackBar(
+      //           content: Text('ShopId is not present!'),
+      //           backgroundColor: Colors.red,
+      //         ),
+      //       );
+      //     return ;
+      // }
+      shopId = 'oMRTytXxid2EuJij2O8r'; // Replace with your actual shop ID
       
       FirebaseFirestore firestore = FirebaseFirestore.instance;
        DocumentSnapshot doc = await firestore.collection("Shop").doc(shopId).get();
@@ -199,6 +213,11 @@ class _BnbLessScreenState extends ConsumerState<BnbLessScreen> with WidgetsBindi
 
       if (query.docs.isNotEmpty) {
         String cartId = query.docs.first.id;
+
+        Cartmodel cartmdel = await Cartmodel.fromFirestore(query.docs.first);
+        if(cartmdel.cart_payment_image!=""){
+          // await deleteImageFromStorage(cartmdel.cart_payment_image);
+        }
         await firestore
             .collection('Cart')
             .doc(cartId)
@@ -213,6 +232,20 @@ class _BnbLessScreenState extends ConsumerState<BnbLessScreen> with WidgetsBindi
       print('Error uploading image: $e');
     }
   }
+
+//   Future<void> deleteImageFromStorage(String url) async {
+//   // Parse the URL
+//      String relativePath = getUrlRelativePath(url);
+//                     print(relativePath);
+//                     Reference refer = FirebaseStorage.instance.ref().child(relativePath);
+//                     await refer.delete();
+//                     print('File deleted successfully');
+// }
+// String getUrlRelativePath(String fullUrl) {
+//     Uri uri = Uri.parse(fullUrl);
+//     String path = uri.pathSegments.skip(4).join('/');
+//     return Uri.decodeFull(path);
+//   }
 
  
   @override

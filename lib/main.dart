@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
@@ -32,7 +33,7 @@ void main() async {
       statusBarBrightness: Brightness.dark,
       systemNavigationBarColor: kWhite,
       systemNavigationBarIconBrightness: Brightness.dark));
-  runApp(const ProviderScope(child: Ofline()));
+  runApp( ProviderScope(child: MaterialApp(home: SplashScreen(),)));
 }
 class Ofline extends ConsumerStatefulWidget {
   const Ofline({super.key});
@@ -80,6 +81,68 @@ class _OflineState extends ConsumerState<Ofline> {
             // AuthenticationPage(),
           ),
         
+        ),
+      ),
+    );
+  }
+}
+
+class SplashScreen extends StatefulWidget {
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+
+    _animation = Tween<double>(begin: 0.0, end: 2.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Start navigation after the first frame is drawn
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(Duration(seconds: 2), () {
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => Ofline()),
+          );
+        }
+      });
+    });
+
+    return Scaffold(
+      body: Center(
+        child: ScaleTransition(
+          scale: _animation,
+          child:const  Icon(
+            Icons.shopping_cart,
+            size: 100.0, // Adjust the size of the icon as needed
+            color: kBlue, // Adjust the color of the icon as needed
+          ),
         ),
       ),
     );

@@ -13,6 +13,7 @@ import 'package:ofline_app/utility/Constants/string_extensions.dart';
 import '../../../../../utility/Constants/color.dart';
 import 'package:uuid/uuid.dart';
 
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Custombottomsheet extends StatefulWidget {
@@ -56,62 +57,6 @@ class _CustombottomsheetState extends State<Custombottomsheet>{
 
 
 
-Future<void> _handleMethod(MethodCall call) async {
-    switch (call.method) {
-      case 'receiveImage':
-        final Map<dynamic, dynamic> arguments = call.arguments;
-        setState(() {
-          _imageFilePath = arguments['filePath'] ?? '';
-          _sourceApp = arguments['sourceApp'] ?? 'Unknown';
-        });
-        // _extractTextFromImage();
-        if(_imageFilePath!=null){
-          uploadImageAndSaveLink();
-        }
-        break;
-      default:
-        print('Unknown method ${call.method}');
-    }
-  }
-
-  Future<void> uploadImageAndSaveLink() async {
-    try {
-      String uniqueId = Uuid().v4();
-      File imageFile = File(_imageFilePath);
-
-      // Upload to Firebase Storage
-      FirebaseStorage storage = FirebaseStorage.instance;
-       Reference ref = storage.ref().child('PaymentImage/$uniqueId.jpg');
-      UploadTask uploadTask = ref.putFile(imageFile);
-      TaskSnapshot taskSnapshot = await uploadTask;
-      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
-
-      // Update Firestore
-      String customerId = 'z2hoSD4BzcNev0tSCmT3mQYnxPz2'; // Replace with your actual customer ID
-      String shopId = 'oMRTytXxid2EuJij2O8r';
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-      QuerySnapshot query = await firestore
-          .collection('Cart')
-          .where('customer_id', isEqualTo: customerId)
-          .where('shop_id', isEqualTo: shopId)
-          .get();
-
-      if (query.docs.isNotEmpty) {
-        String cartId = query.docs.first.id;
-        await firestore
-            .collection('Cart')
-            .doc(cartId)
-            .update({'cart_payment_image': downloadUrl});
-        print("added successsfully -------");
-      } else {
-        print('No matching cart found');
-      }
-    } catch (e) {
-      print('Error uploading image: $e');
-    }
-  }
-
- 
 void UpdateItemCount(int index,int qty) async {
   // Get a reference to the specific cart document
   DocumentReference docRef = _firestore.collection('Cart').doc(cartmdel!.id);
@@ -448,6 +393,7 @@ void UpdateItemCount(int index,int qty) async {
                                 ),
                                 onPressed: () {
                                   // Define your onPressed action here
+                                  _storeShopId();
                                   print('Icon button pressed');
                                 },
                             )
