@@ -31,7 +31,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.ofline_marketplace.ofline_app"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 34 // Update to 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -49,8 +49,8 @@ android {
 
     defaultConfig {
         applicationId "com.ofline_marketplace.ofline_app"
-        minSdkVersion 23
-        targetSdkVersion 33
+        minSdkVersion 23 // Typically set to a lower value for backward compatibility
+        targetSdkVersion 34 // Update to 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -69,6 +69,18 @@ android {
             signingConfig signingConfigs.release
         }
     }
+
+    flavorDimensions "env"
+    productFlavors {
+        dev {
+            dimension "env"
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+        }
+        prod {
+            dimension "env"
+        }
+    }
 }
 
 flutter {
@@ -84,8 +96,7 @@ dependencies {
     implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation "com.squareup.okio:okio:2.8.0"
 
-
-        // Firebase Messaging with exclusion of firebase-iid to resolve conflict
+    // Firebase Messaging with exclusion of firebase-iid to resolve conflict
     implementation('com.google.firebase:firebase-messaging:24.0.0') {
         exclude group: 'com.google.firebase', module: 'firebase-iid'
     }
@@ -97,3 +108,5 @@ dependencies {
 configurations.all {
     resolutionStrategy.force "com.squareup.okio:okio:2.8.0"
 }
+
+apply plugin: 'com.google.gms.google-services'
