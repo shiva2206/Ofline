@@ -97,5 +97,5 @@ final favoriteShopsProvider = StreamProvider<List<ShopModel>>((ref) {
   final shopRepository = ref.watch(shopRepositoryProvider);
   final userLocation = ref.watch(locationProvider);
   return shopRepository.fetchFavouriteShops(latitude: userLocation?.latitude,longitude:userLocation?.longitude);
-  return shopRepository.fetchFavouriteShops();
+ 
 });

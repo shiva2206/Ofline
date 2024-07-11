@@ -1,8 +1,6 @@
 plugins {
     id "com.android.application"
-    // START: FlutterFire Configuration
-    id 'com.google.gms.google-services'
-    // END: FlutterFire Configuration
+    id "com.google.gms.google-services" // Firebase configuration
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 }
@@ -50,10 +48,7 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.ofline_marketplace.ofline_app"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 23
         targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()
@@ -68,11 +63,11 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
+
     buildTypes {
         release {
             signingConfig signingConfigs.release
         }
-
     }
 }
 
@@ -81,14 +76,21 @@ flutter {
 }
 
 dependencies {
+    implementation 'com.google.firebase:firebase-appcheck-playintegrity:16.0.0-beta04'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.0"
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'com.google.firebase:firebase-auth:23.0.0' // Add this line
-    implementation 'com.google.android.gms:play-services-auth:21.2.0' // Add this line
+    implementation 'com.google.firebase:firebase-auth:23.0.0'
+    implementation 'com.google.android.gms:play-services-auth:21.2.0'
     implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation "com.squareup.okio:okio:2.8.0"
-    implementation 'com.google.firebase:firebase-appcheck-playintegrity:16.0.0-beta04'
 
+
+        // Firebase Messaging with exclusion of firebase-iid to resolve conflict
+    implementation('com.google.firebase:firebase-messaging:24.0.0') {
+        exclude group: 'com.google.firebase', module: 'firebase-iid'
+    }
+    // Explicitly add the latest version of firebase-iid
+    implementation 'com.google.firebase:firebase-iid:21.1.0'
 }
 
 // Resolve dependency conflicts

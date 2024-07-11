@@ -18,14 +18,13 @@ import 'package:ofline_app/utility/Location/ViewModel/locationViewModel.dart';
 import 'auth/View/authView.dart';
 import 'utility/firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
- 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -36,8 +35,18 @@ void main() async {
       statusBarBrightness: Brightness.dark,
       systemNavigationBarColor: kWhite,
       systemNavigationBarIconBrightness: Brightness.dark));
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp( ProviderScope(child: MaterialApp(home: SplashScreen(),)));
+
+
 }
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print("Handling a background message: ${message.messageId}");
+}
+
+
 class Ofline extends ConsumerStatefulWidget {
   const Ofline({super.key});
   @override
@@ -72,7 +81,7 @@ class _OflineState extends ConsumerState<Ofline> {
                     if (snapshot.data == null){
                       return const AuthenticationPage();
                     }
-                    else {
+                    else{
                       return const BnbLessScreen();
                       // ShopModel sp = new ShopModel(id: "oMRTytXxid2EuJij2O8r", shop_name: "ok shine", shopImageLink: "", address: "", isOpen: true, latitude: 12, longitude: 80, startingYear: "1998", fav_count: 0, views:0, isActivated: true, live_view: 0, date: "12-3-2023");
                       // return Custombottomsheet(shop: sp, customerId: "z2hoSD4BzcNev0tSCmT3mQYnxPz2");
@@ -151,3 +160,44 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 }
+
+
+
+// class NotificationPage extends StatefulWidget {
+//   @override
+//   _NotificationPageState createState() => _NotificationPageState();
+// }
+
+// class _NotificationPageState extends State<NotificationPage> {
+//   @override
+//   void initState() {
+//     super.initState();
+//     FirebaseMessaging.instance
+//         .getInitialMessage()
+//         .then((RemoteMessage? message) {
+//       if (message != null) {
+//         print('Initial message: ${message.data}');
+//       }
+//     });
+
+//     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+//       print('Foreground message: ${message.data}');
+//     });
+
+//     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+//       print('Message clicked!');
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Push Notifications'),
+//       ),
+//       body: Center(
+//         child: Text('Listening for notifications...'),
+//       ),
+//     );
+//   }
+// }

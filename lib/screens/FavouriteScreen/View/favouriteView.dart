@@ -43,7 +43,7 @@ class _Favourite_ScreenState extends ConsumerState<Favourite_Screen> {
                         ) {
                       final shop = favShops[index];
                       print(shop.distance);
-                      return ShopCard(key:ValueKey(shop.id),shop: shop, mqh: mqh, mqw: mqw,isFavourite: true);
+                      return ShopCard(key:ValueKey(shop.id + shop.fav_count.toString()),shop: shop, mqh: mqh, mqw: mqw,isFavourite: true);
                     });}
               , error: (error, stackTrace) {
                 return Center(child: Text('Error: $error'));
