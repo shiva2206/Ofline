@@ -85,11 +85,15 @@ void UpdateItemCount(int index,int qty) async {
 
       // Increment the 'Count'
       item['cart_product_qty'] += qty;
-      print("hell");
-
+      item['total_cart_product_price'] = item['cart_product_price'] * item['cart_product_qty'];
+      if(item['cart_product_qty']==0){
+        cartlist.removeAt(index);
+        print("zerrooo");
+      }
+      else{
       // Replace the old item with the updated item
-      cartlist[index] = item;
-
+        cartlist[index] = item;
+      }
       // Update the document with the new array
       transaction.update(docRef, {'cart_items': cartlist });
     });
@@ -109,13 +113,22 @@ void UpdateItemCount(int index,int qty) async {
   Stream<Cartmodel?> cartStream() {
     return FirebaseFirestore.instance
         .collection('Cart')
-        .where('shop_id', isEqualTo: widget.shop.id)
-        .where('customer_id', isEqualTo: widget.customerId)
+        .where('shop_id', isEqualTo: "oMRTytXxid2EuJij2O8r")
+        .where('customer_id', isEqualTo: "z2hoSD4BzcNev0tSCmT3mQYnxPz2")
    
         .snapshots()
-        .map((snapshot) => snapshot.docs.isNotEmpty
-            ? Cartmodel.fromFirestore(snapshot.docs.first)
-            : null);
+        .map((snapshot){ 
+            if(snapshot.docs.isEmpty){
+              return null;
+            }
+            print("___________not cull----------");
+            Cartmodel cdmel =  Cartmodel.fromFirestore(snapshot.docs.first);
+            print(cdmel);
+            return cdmel;
+
+        });
+
+  
   }
 
   @override
@@ -479,7 +492,7 @@ void UpdateItemCount(int index,int qty) async {
                       child: Column(
                         children: [
                           Padding(
-                            padding: EdgeInsets.all(10.0),
+                            padding: const EdgeInsets.all(10.0),
                             child: Text(widget.shop.shop_name.toTitleCase() + cartmdel!.cart_payment_image,
                                 style: const TextStyle(
                                     color: kBlue,
@@ -632,7 +645,7 @@ void UpdateItemCount(int index,int qty) async {
                                                           //   print("After increment: ${item.product_qty}");
                                                           // });
                                                         },
-                                                        child: Icon(
+                                                        child: const Icon(
                                                           Icons.add,
                                                           color: kWhite,
                                                           size: 19.5,

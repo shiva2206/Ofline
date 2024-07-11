@@ -41,7 +41,7 @@ class _CartviewState extends State<Cartview> {
               Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => 
-                              Custombottomsheet(shop: widget.shop, customerId: widget.customerId)
+                              Custombottomsheet(shop: widget.shop, customerId: "z2hoSD4BzcNev0tSCmT3mQYnxPz2")
                       ),
                   );
             },
@@ -56,7 +56,7 @@ class _CartviewState extends State<Cartview> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Expanded(
+                      const Expanded(
                         child: Text(
                           "0",
                           // cartmdel!.total_amount.toString(),
@@ -71,14 +71,14 @@ class _CartviewState extends State<Cartview> {
                       Center(
                         child: SizedBox(
                           width: mqw * 100 / 1080,
-                          child: Icon(
+                          child: const Icon(
                             Icons.shopping_cart,
                             color: kWhite,
                             size: 20,
                           ),
                         ),
                       ),
-                      Expanded(
+                      const Expanded(
                         child: Text(
                           'Rupe',
                           // '₹' + cartmdel!.total_cart_item.toString(),

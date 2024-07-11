@@ -170,7 +170,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 onTap: () async {
                   await GoogleSignIn().signOut();
                   FirebaseAuth.instance.signOut();
-                  Navigator.of(context).pop();
+                  
                 },
                 child: Container(
                   height: widget.mqh * 0.045,

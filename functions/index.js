@@ -4,7 +4,7 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 
 exports.resetShopViews = functions.region("asia-south1")
-    .pubsub.schedule("every day 18:30")
+    .pubsub.schedule("every day 00:00")
     .timeZone("Asia/Kolkata")
     .onRun(async (context) => {
       const db = admin.firestore();

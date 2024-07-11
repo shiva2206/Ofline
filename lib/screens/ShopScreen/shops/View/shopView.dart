@@ -65,9 +65,7 @@ class _Home_Body_ScreenState extends ConsumerState<Home_Body_Screen> {
     final shopListAsyncValue =
         ref.watch(shopListProvider(ref.watch(searchTextProvider)));
     final favShopListAsyncValue = ref.watch(favoriteShopIdsProvider);
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
+    return Scaffold(
             resizeToAvoidBottomInset: false,
             backgroundColor: kWhite,
             appBar: const MyAppBar(
@@ -105,6 +103,6 @@ class _Home_Body_ScreenState extends ConsumerState<Home_Body_Screen> {
                 return const CircularProgressIndicator(
                     color: Colors.transparent);
               }),
-            )));
+    ));
   }
 }
