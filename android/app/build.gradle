@@ -74,7 +74,6 @@ android {
     productFlavors {
         dev {
             dimension "env"
-            applicationIdSuffix ".dev"
             versionNameSuffix "-dev"
         }
         prod {
@@ -107,6 +106,27 @@ dependencies {
 // Resolve dependency conflicts
 configurations.all {
     resolutionStrategy.force "com.squareup.okio:okio:2.8.0"
+}
+
+// Add this block to handle different google-services.json files
+android.applicationVariants.all { variant ->
+    def flavorName = variant.flavorName
+    def variantName = variant.name
+
+    def fileName = flavorName == "prod" ? "google-services.json" : "google-services-dev.json"
+
+    def srcDir = "${project.rootDir}/app"
+    def destDir = "${project.buildDir}/generated/res/google-services/${variantName}"
+
+    // Create a copy task
+    def copyGoogleServicesJson = tasks.register("copy${variantName.capitalize()}GoogleServicesJson", Copy) {
+        from("${srcDir}/${fileName}")
+        into(destDir)
+        rename { "google-services.json" }
+    }
+
+    // Ensure the copy task runs before the google services plugin
+    variant.mergeResources.dependsOn copyGoogleServicesJson
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "928193570216",
+    "project_id": "ofline-dev",
+    "storage_bucket": "ofline-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:928193570216:android:af732b607d3f6a66d3299d",
+        "android_client_info": {
+          "package_name": "com.ofline_marketplace.ofline_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "928193570216-v900bag34atkirudmicgh5qgl515vcjq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuP-CAi69WCr55qVCTlCmKhFRbgL4pDp0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "928193570216-v900bag34atkirudmicgh5qgl515vcjq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "928193570216-2qiot7ha45ll29h7ek64ep97sv384alv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ofline.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
