@@ -43,7 +43,7 @@ void main() async {
       systemNavigationBarColor: kWhite,
       systemNavigationBarIconBrightness: Brightness.dark));
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp( ProviderScope(child: MaterialApp(home: SplashScreen(),)));
+  runApp( ProviderScope(child: MaterialApp(home: SplashScreen(), debugShowCheckedModeBanner: false,)));
 
 
 }
@@ -121,10 +121,10 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(milliseconds: 1500),
     );
 
-    _animation = Tween<double>(begin: 0.0, end: 2.0).animate(
+    _animation = Tween<double>(begin: 0.0, end: 0.5).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Curves.easeInOut,
@@ -144,7 +144,7 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     // Start navigation after the first frame is drawn
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(seconds: 2), () {
+      Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => Ofline()),
@@ -154,14 +154,16 @@ class _SplashScreenState extends State<SplashScreen>
     });
 
     return Scaffold(
+      backgroundColor: kWhite,
       body: Center(
         child: ScaleTransition(
           scale: _animation,
-          child:const  Icon(
-            Icons.shopping_cart,
-            size: 100.0, // Adjust the size of the icon as needed
-            color: kBlue, // Adjust the color of the icon as needed
-          ),
+          child: Image.asset("images/image_ofline.png"),
+          // child:const  Icon(
+          //   Icons.shopping_cart,
+          //   size: 100.0, // Adjust the size of the icon as needed
+          //   color: kBlue, // Adjust the color of the icon as needed
+          // ),
         ),
       ),
     );
