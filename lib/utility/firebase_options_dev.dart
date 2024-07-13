@@ -26,9 +26,15 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -47,30 +53,10 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCuP-CAi69WCr55qVCTlCmKhFRbgL4pDp0',
+    apiKey: 'AIzaSyCb01jDBnDAZ34u-OeGbLmVgz87kzGZjPA',
     appId: '1:928193570216:android:af732b607d3f6a66d3299d',
     messagingSenderId: '928193570216',
     projectId: 'ofline-dev',
     storageBucket: 'ofline-dev.appspot.com',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBX23FD8J08Zw3rGGpOf2qZ3cabYu3RyEg',
-    appId: '1:928193570216:ios:35fc9157f821fb5ed3299d',
-    messagingSenderId: '928193570216',
-    projectId: 'ofline-dev',
-    storageBucket: 'ofline-dev.appspot.com',
-    iosClientId: '928193570216-2qiot7ha45ll29h7ek64ep97sv384alv.apps.googleusercontent.com',
-    iosBundleId: 'com.ofline.app',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBX23FD8J08Zw3rGGpOf2qZ3cabYu3RyEg',
-    appId: '1:928193570216:ios:35fc9157f821fb5ed3299d',
-    messagingSenderId: '928193570216',
-    projectId: 'ofline-dev',
-    storageBucket: 'ofline-dev.appspot.com',
-    iosClientId: '928193570216-2qiot7ha45ll29h7ek64ep97sv384alv.apps.googleusercontent.com',
-    iosBundleId: 'com.ofline.app',
   );
 }

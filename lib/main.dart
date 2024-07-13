@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -16,15 +17,20 @@ import 'package:ofline_app/screens/ShopScreen/shops/Model/shopModel.dart';
 import 'package:ofline_app/utility/Constants/color.dart';
 import 'package:ofline_app/utility/Location/ViewModel/locationViewModel.dart';
 import 'auth/View/authView.dart';
-import 'utility/firebase_options.dart';
+import 'utility/firebase_options_prod.dart' as prod;
+import 'utility/firebase_options_dev.dart' as dev;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  FirebaseOptions options = kReleaseMode
+      ? prod.DefaultFirebaseOptions.currentPlatform
+      : dev.DefaultFirebaseOptions.currentPlatform;
+
   await Firebase.initializeApp(
-    name:"ofline-dev",
-    options: DefaultFirebaseOptions.currentPlatform,
+    name :"ofline-dev",
+    options: options,
   );
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

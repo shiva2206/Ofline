@@ -1,95 +1,41 @@
 {
   "project_info": {
-    "project_number": "411318694896",
-    "project_id": "ofline-80f07",
-    "storage_bucket": "ofline-80f07.appspot.com"
+    "project_number": "928193570216",
+    "project_id": "ofline-dev",
+    "storage_bucket": "ofline-dev.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:411318694896:android:d6c059e0f8b9dbb2e56335",
-        "android_client_info": {
-          "package_name": "com.co_ofline_app.co_ofline"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "411318694896-c955pd5pa6uram0hl2g10bapu9hkpq4h.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.co_ofline_app.co_ofline",
-            "certificate_hash": "1f7ec1d29f319b47e4de4c7036abe623e947de2a"
-          }
-        },
-        {
-          "client_id": "411318694896-rm0lsf8hmsa8ndibrlh6tj17cl68dgn2.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.co_ofline_app.co_ofline",
-            "certificate_hash": "bdca7c0463a7a186d4726bf380c37335fee91084"
-          }
-        },
-        {
-          "client_id": "411318694896-o4sjbi7ac2hg8v8uhvd7ogtgk7qc2glu.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAQK3tVRsHFzCA60Rw5lNu9-Ryc1-R1er8"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "411318694896-o4sjbi7ac2hg8v8uhvd7ogtgk7qc2glu.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:411318694896:android:fed62dabdca76cfde56335",
+        "mobilesdk_app_id": "1:928193570216:android:af732b607d3f6a66d3299d",
         "android_client_info": {
           "package_name": "com.ofline_marketplace.ofline_app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "411318694896-grr85a08o2begmj6rh50qi3n3po374ij.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.ofline_marketplace.ofline_app",
-            "certificate_hash": "89661e5ed1d7012070b0b87f17ba87797aac2290"
-          }
-        },
-        {
-          "client_id": "411318694896-lfjbku0isr3g198ehron65aivfbj2sts.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.ofline_marketplace.ofline_app",
-            "certificate_hash": "1f7ec1d29f319b47e4de4c7036abe623e947de2a"
-          }
-        },
-        {
-          "client_id": "411318694896-o4sjbi7ac2hg8v8uhvd7ogtgk7qc2glu.apps.googleusercontent.com",
+          "client_id": "928193570216-v900bag34atkirudmicgh5qgl515vcjq.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAQK3tVRsHFzCA60Rw5lNu9-Ryc1-R1er8"
+          "current_key": "AIzaSyCuP-CAi69WCr55qVCTlCmKhFRbgL4pDp0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "411318694896-o4sjbi7ac2hg8v8uhvd7ogtgk7qc2glu.apps.googleusercontent.com",
+              "client_id": "928193570216-v900bag34atkirudmicgh5qgl515vcjq.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "928193570216-2qiot7ha45ll29h7ek64ep97sv384alv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ofline.app"
+              }
             }
           ]
         }
