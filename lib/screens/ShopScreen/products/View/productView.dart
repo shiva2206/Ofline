@@ -4,8 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ofline_app/screens/ShopScreen/carts/View/CartView.dart';
-import 'package:ofline_app/screens/ShopScreen/carts/View/CustomBottomSheet.dart';
+import 'package:ofline_app/screens/ShopScreen/cart/Model/CartModel.dart';
+import 'package:ofline_app/screens/ShopScreen/cart/View/CartView.dart';
+import 'package:ofline_app/screens/ShopScreen/cart/View/CustomBottomSheet.dart';
 
 import 'package:ofline_app/screens/ShopScreen/products/ViewModel/productViewModel.dart';
 import 'package:ofline_app/utility/Widgets/animatedSearch/ViewModel/searchViewModel.dart';
@@ -29,9 +30,31 @@ class Product_Screen extends ConsumerStatefulWidget {
 }
 
 class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBindingObserver{
-  String groupValue = 'Dine In';
-  int count =-1;
+    String groupValue = 'Dine In';
+  int count = -1;
+  late Map<String, dynamic> sortedMap;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+   OverlayEntry? _overlayEntry;
+
+   void _showOverlay(BuildContext context) {
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        left: 0,
+        right: 0,
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Custombottomsheet(
+            shop: widget.shop,
+            customerId: FirebaseAuth.instance.currentUser!.uid,
+            overlayEntry: _overlayEntry,
+          ),
+        ),
+      ),
+    );
+
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
   @override
   void initState(){
     // TODO: implement initState
@@ -39,22 +62,26 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
     super.initState();
      WidgetsBinding.instance.addObserver(this);
     updateCount();
+    
 
      if (widget.toCart) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => Custombottomsheet(
-            shop: widget.shop,
-            customerId: "z2hoSD4BzcNev0tSCmT3mQYnxPz2",
-          ),
-        ),
-      ).then((_) {
-        setState(() {
-          widget.toCart = false; // Reset the flag when returning from the Custombottomsheet screen
-        });
-      });
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   Navigator.of(context).push(
+    //     MaterialPageRoute(
+    //       builder: (context) => Custombottomsheet(
+    //         shop: widget.shop,
+    //         customerId: "z2hoSD4BzcNev0tSCmT3mQYnxPz2",
+    //       ),
+    //     ),
+    //   ).then((_) {
+    //     setState(() {
+    //       widget.toCart = false; // Reset the flag when returning from the Custombottomsheet screen
+    //     });
+    //   });
+    // });
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showOverlay(context));
+
+    
   }
     
 
@@ -63,48 +90,40 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
   }
 
   Timer? _debounceTimer;
-  @override
+   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     super.didChangeAppLifecycleState(state);
     print("---------------");
     print(state);
     print("---------------");
 
-   
-      DocumentReference shopRef = FirebaseFirestore.instance.collection('Shop').doc(widget.shop.id);
+    DocumentReference shopRef = FirebaseFirestore.instance.collection('Shop').doc(widget.shop.id);
 
-      if (state == AppLifecycleState.inactive) {
-        await shopRef.update({
-          'live_view': FieldValue.increment(count),
-        });
-        count = -1;
-        print("minus 1");
-      } else if (state == AppLifecycleState.resumed) {
-        await shopRef.update({
-          'live_view': FieldValue.increment(1),
-        });
-        print("plus 1");
-      }else if(state == AppLifecycleState.hidden){
-        count = 0;
-      }
-      print("----------finished");
-  
+    if (state == AppLifecycleState.inactive) {
+      await shopRef.update({
+        'live_view': FieldValue.increment(count),
+      });
+      count = -1;
+      print("minus 1");
+    } else if (state == AppLifecycleState.resumed) {
+      await shopRef.update({
+        'live_view': FieldValue.increment(1),
+      });
+      print("plus 1");
+    } else if (state == AppLifecycleState.hidden) {
+      count = 0;
+    }
+    print("----------finished");
   }
 
-
-  void updateCount()async{
+  void updateCount() async {
     try {
       final DocumentReference shopRef = _firestore.collection('Shop').doc(widget.shop.id);
 
       await shopRef.update({'live_view': FieldValue.increment(1)});
-
-      
-
       await shopRef.update({'views': FieldValue.increment(1)});
 
       print("Views count updated successfully");
-
-
     } catch (e) {
       print("Error updating Views count: $e");
       throw e; // or handle error appropriately
@@ -113,24 +132,87 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
 
   Map<String, String?> dropdownValues = {};
   String filter = 'All';
+  List<CartItem> cartValues = [];
+  Map<String, bool> isAddedMap = {};
 
-  void decreaseLiveCount()async{
+  void decreaseLiveCount() async {
     ref.read(searchTextProvider.notifier).state = "";
     final DocumentReference shopRef = _firestore.collection('Shop').doc(widget.shop.id);
 
     await shopRef.update({'live_view': FieldValue.increment(-1)});
   }
 
+  Future<void> addToCart(ProductModel product) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+
+    final cartRef = _firestore.collection('Cart')
+        .where('shop_id', isEqualTo: widget.shop.id)
+        .where('customer_id', isEqualTo: userId);
+    final cartSnapshot = await cartRef.get();
+
+    int productPrice = product.sizeVariants[dropdownValues[product.product_name]];
+
+    if (cartSnapshot.docs.isNotEmpty) {
+      final existingCartDoc = cartSnapshot.docs.first.reference;
+      final cartData = cartSnapshot.docs.first.data();
+
+      List<dynamic> cartItems = cartData['cart_items'];
+      bool productFound = false;
+      for (var item in cartItems) {
+        if (item['cart_product_name'] == product.product_name && item['cart_product_sizeVariant']==dropdownValues[product.product_name]) {
+          item['cart_product_qty'] += 1;
+          item['total_cart_product_price'] = item['cart_product_qty'] * productPrice;
+          productFound = true;
+          break;
+        }
+      }
+
+      if (productFound) {
+        await existingCartDoc.update({
+          'cart_items': cartItems,
+          'total_cart_item': FieldValue.increment(1),
+          'total_amount': FieldValue.increment(productPrice),
+        });
+      } else {
+        await existingCartDoc.update({
+          'cart_items': FieldValue.arrayUnion([{
+            'cart_product_name': product.product_name,
+            'cart_product_price': productPrice,
+            'cart_product_qty': 1,
+            'cart_product_sizeVariant': dropdownValues[product.product_name],
+            'total_cart_product_price': productPrice,
+          }]),
+          'total_cart_item': FieldValue.increment(1),
+          'total_amount': FieldValue.increment(productPrice),
+        });
+      }
+    } else {
+      final newCartDoc = _firestore.collection('Cart').doc();
+      await newCartDoc.set({
+        'customer_id': userId,
+        'shop_id': widget.shop.id,
+        'cart_items': [{
+          'cart_product_name': product.product_name,
+          'cart_product_price': productPrice,
+          'cart_product_qty': 1,
+          'cart_product_sizeVariant': dropdownValues[product.product_name],
+          'total_cart_product_price': productPrice,
+        }],
+        'total_amount': productPrice,
+        'total_cart_item': 1,
+        'cart_payment_image': ""
+      });
+    }
+  }
+
   @override
   void dispose() {
-    // TODO: implement dispose
-
-    // ref.read(searchTextProvider.notifier).state = "";
- WidgetsBinding.instance.removeObserver(this);
-  // decreaseLiveCount();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
-
   }
+
+
   @override
   Widget build(BuildContext context) {
     final productListAsyncValue = ref.watch(productListProvider(widget.shop.id));
@@ -140,9 +222,9 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
     var mqw = MediaQuery.of(context).size.width;
     var mqh = MediaQuery.of(context).size.height;
     print(dropdownValues);
-
+    
     return PopScope(
-      onPopInvoked: (didPop)async{
+      onPopInvoked: (didPop) async {
         decreaseLiveCount();
         ref.read(searchTextProvider.notifier).state = "";
       },
@@ -198,12 +280,9 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
                                       borderRadius: BorderRadius.circular(18)),
                                   height: mqh * 800 / 2340,
                                   width: mqw * 10 / 1080,
-                                  child:
-                                  productListAsyncValue.when(data: (products) {
-
+                                  child: productListAsyncValue.when(data: (products) {
                                     for (var product in products) {
-                                      if (!categorySet
-                                          .contains(product.sub_category)) {
+                                      if (!categorySet.contains(product.sub_category)) {
                                         categorySet.add(product.sub_category);
                                       }
                                     }
@@ -262,9 +341,9 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
                 flex: 14,
                 child: productListAsyncValue.when(data: (products) {
                   List<ProductModel> inStockProducts =
-                  products.where((product) => filter=='All' ? product.inStock : product.inStock && product.sub_category==filter).toList();
+                  products.where((product) => filter == 'All' ? product.inStock : product.inStock && product.sub_category == filter).toList();
                   return Padding(
-                    padding:  EdgeInsets.only(top: mqh*15/2340),
+                    padding: EdgeInsets.only(top: mqh * 15 / 2340),
                     child: GridView.builder(
                       gridDelegate:
                       const SliverGridDelegateWithFixedCrossAxisCount(
@@ -279,7 +358,7 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
                         Map<String, dynamic> unsortedMap = product.sizeVariants;
                         List<MapEntry<String, dynamic>> sortedEntries = unsortedMap.entries.toList();
                         sortedEntries.sort((a, b) => a.value.compareTo(b.value));
-                        Map<String, dynamic> sortedMap = Map.fromEntries(sortedEntries);
+                        sortedMap = Map.fromEntries(sortedEntries);
                         dropdownValues.putIfAbsent(
                             product.product_name, () => sortedMap.keys.first);
 
@@ -319,22 +398,21 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
                                       ),
                                     ),
                                   ),
-                                  product.isVeg?
+                                  product.isVeg ?
                                   Positioned(
-                                    right: mqw*35/1080,
-                                    top: mqh*40/2340,
+                                    right: mqw * 35 / 1080,
+                                    top: mqh * 40 / 2340,
                                     child: Container(
-                                      height: mqh*53/2340,
-                                      width: mqw* 50/1080,
+                                      height: mqh * 53 / 2340,
+                                      width: mqw * 50 / 1080,
                                       decoration: BoxDecoration(
                                           border: Border.all(color: Colors.green, width: 1.5),
                                           color: kWhite, borderRadius: BorderRadius.circular(4)),
                                       child: const Center(
                                         child: CircleAvatar(backgroundColor: Colors.green, radius: 5),
                                       ),
-
                                     ),
-                                  ): const SizedBox( height:2,width:2),
+                                  ) : const SizedBox(height: 2, width: 2),
                                 ],),
 
 
@@ -347,7 +425,6 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
                                     mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                     children: [
-
                                       Container(
                                         width: mqw * 250 / 1080,
                                         height: mqh * 115 / 2340,
@@ -411,8 +488,7 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
                                           ),
                                           onChanged: (String? newValue) {
                                             setState(() {
-                                              dropdownValues[product.product_name] =
-                                                  newValue;
+                                              dropdownValues[product.product_name] = newValue;
                                             });
                                           },
                                           borderRadius:
@@ -435,7 +511,7 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
                                       SizedBox(
                                         width: mqw * 50 / 1080,
                                       ),
-                                      Container(
+                                      isAddedMap[product.product_name]==true ? Container(child: Icon(Icons.check, color: kBlue, size: 20), color: kWhite,) : Container(
                                         height: mqh * 70 / 2340,
                                         width: mqw * 140 / 1080,
                                         decoration: const BoxDecoration(
@@ -444,13 +520,27 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
                                           ),
                                           color: kBlue,
                                         ),
-                                        child: const Center(
-                                          child: Text(
-                                            'Add',
-                                            style: TextStyle(
-                                              color: kWhite,
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w600,
+                                        child: Center(
+                                          child: InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                isAddedMap[product.product_name] = true;
+                                              });
+                                              addToCart(product).then((_) {
+                                                Future.delayed(const Duration(seconds: 5), () {
+                                                  setState(() {
+                                                    isAddedMap[product.product_name] = false;
+                                                  });
+                                                });
+                                              });
+                                            },
+                                            child: const Text(
+                                              'Add',
+                                              style: TextStyle(
+                                                color: kWhite,
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -473,7 +563,7 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
                 })),
             Expanded(
               flex: 1,
-              child: Cartview(shop: widget.shop, customerId: "z2hoSD4BzcNev0tSCmT3mQYnxPz2",),
+              child: Cartview(shop: widget.shop, customerId: user!, cart: cartValues,showOverlay: _showOverlay,),
             ),
           ],
         ),

@@ -17,6 +17,8 @@ class ShopModel {
   final int fav_count;
   final int live_view;
   final bool isActivated;
+  final String shop_upi;
+  final String shop_merchant_name;
 
   double distance = 0.0;
   String distanceText= "";
@@ -34,7 +36,9 @@ class ShopModel {
     required this.views,
     required this.isActivated,
     required this.live_view,
-    required this.date
+    required this.date,
+    required this.shop_upi,
+    required this.shop_merchant_name
   });
 
   factory ShopModel.fromFirestore(DocumentSnapshot doc) {
@@ -53,7 +57,9 @@ class ShopModel {
       views: data['views'],
       isActivated: data['isActivated'],
       live_view: data['live_view'],
-      date: data['date'] ?? ""
+      date: data['date'] ?? "",
+      shop_upi: data['shop_upi'],
+      shop_merchant_name: data['merchant_upi_name']
     );
   }
 }
@@ -69,5 +75,4 @@ class ShopModel {
 //     required this.longitude,
 //   });
 // }
-
 

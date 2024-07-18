@@ -35,6 +35,7 @@ dependencies:
   shared_preferences: ^2.2.3
   firebase_messaging: ^15.0.3
   firebase_app_check: ^0.3.0+3
+  audioplayers: ^6.0.0
 
 dev_dependencies:
   flutter_test:
@@ -57,6 +58,8 @@ flutter:
     - images/burger-king-2.jpg
     - images/image_co_ofline.png
     - images/image_ofline.png
+
+    - assets/ofline_cart.mp3
 #    - assets/note1.wav.mp3
 #    - assets/note2.wav.mp3
 #    - assets/note3.wav.mp3

@@ -11,8 +11,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 
 import 'package:ofline_app/screens/BNB.dart';
-import 'package:ofline_app/screens/ShopScreen/carts/View/CartView.dart';
-import 'package:ofline_app/screens/ShopScreen/carts/View/CustomBottomSheet.dart';
+import 'package:ofline_app/screens/ShopScreen/cart/View/CartView.dart';
+import 'package:ofline_app/screens/ShopScreen/cart/View/CustomBottomSheet.dart';
 import 'package:ofline_app/screens/ShopScreen/products/View/productView.dart';
 import 'package:ofline_app/screens/ShopScreen/shops/Model/shopModel.dart';
 import 'package:ofline_app/utility/Constants/color.dart';

@@ -1,7 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ofline_app/screens/ShopScreen/carts/Model/CartModel.dart';
+import 'package:ofline_app/screens/ShopScreen/cart/Model/CartModel.dart';
 import 'package:ofline_app/screens/ShopScreen/products/View/productView.dart';
 import 'package:ofline_app/screens/ShopScreen/shops/Model/shopModel.dart';
 import 'package:ofline_app/utility/Location/ViewModel/locationViewModel.dart';
@@ -47,7 +48,7 @@ class _BnbLessScreenState extends ConsumerState<BnbLessScreen> with WidgetsBindi
   List<Widget> bnbScreen = [
     const Home_Body_Screen(),
     const Favourite_Screen(),
-    const History_Screen()
+      History_Screen(customerId: FirebaseAuth.instance.currentUser!.uid,)
   ];
 
 
@@ -184,7 +185,7 @@ class _BnbLessScreenState extends ConsumerState<BnbLessScreen> with WidgetsBindi
       String downloadUrl = await taskSnapshot.ref.getDownloadURL();
 
         // Update Firestore
-      String customerId = 'z2hoSD4BzcNev0tSCmT3mQYnxPz2'; // Replace with your actual customer ID
+      String customerId = FirebaseAuth.instance.currentUser!.uid; // Replace with your actual customer ID
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String? shopId = await prefs.getString("shopId");
@@ -197,7 +198,7 @@ class _BnbLessScreenState extends ConsumerState<BnbLessScreen> with WidgetsBindi
       //       );
       //     return ;
       // }
-      shopId = 'oMRTytXxid2EuJij2O8r'; // Replace with your actual shop ID
+      // shopId = 'oMRTytXxid2EuJij2O8r'; // Replace with your actual shop ID
       
       FirebaseFirestore firestore = FirebaseFirestore.instance;
        DocumentSnapshot doc = await firestore.collection("Shop").doc(shopId).get();
