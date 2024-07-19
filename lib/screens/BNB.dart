@@ -45,13 +45,12 @@ class _BnbLessScreenState extends ConsumerState<BnbLessScreen> with WidgetsBindi
 
   int myIndex = 0;
 
+ // Bottom Navigation Screens
   List<Widget> bnbScreen = [
-    const Home_Body_Screen(),
-    const Favourite_Screen(),
-      // History_Screen(customerId: FirebaseAuth.instance.currentUser!.uid,)
-      History_Screen(customerId: "z2hoSD4BzcNev0tSCmT3mQYnxPz2",)
+    const Home_Body_Screen(key: PageStorageKey('Home')),
+     Favourite_Screen(key: UniqueKey(),),
+    History_Screen(customerId: FirebaseAuth.instance.currentUser!.uid, key: PageStorageKey('History')),
   ];
-
 
   @override
   void initState() {
@@ -257,18 +256,21 @@ class _BnbLessScreenState extends ConsumerState<BnbLessScreen> with WidgetsBindi
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      // body: IndexedStack(
-      //   index: myIndex,
-      //   children: bnbScreen,
-      // ),
-      body: bnbScreen[myIndex],
+      body: IndexedStack(
+        index: myIndex,
+        children: bnbScreen,
+      ),
       backgroundColor: kWhite,
       bottomNavigationBar: SizedBox(
-        height: mqh*185/2340,
+        height: mqh * 185 / 2340,
         child: BottomNavigationBar(
           enableFeedback: true,
           onTap: (index) {
             setState(() {
+              // if (index == 1) {
+              //   // Recreate the Favourite_Screen to force a rebuild
+              //   bnbScreen[1] = Favourite_Screen(key: UniqueKey());
+              // }
               myIndex = index;
             });
           },
@@ -276,17 +278,14 @@ class _BnbLessScreenState extends ConsumerState<BnbLessScreen> with WidgetsBindi
           selectedItemColor: kBlue,
           unselectedItemColor: kGrey.withOpacity(0.6),
           showSelectedLabels: true,
-          selectedLabelStyle: const TextStyle(
-              color: kBlue, fontWeight: FontWeight.w500, fontSize: 16),
+          selectedLabelStyle: const TextStyle(color: kBlue, fontWeight: FontWeight.w500, fontSize: 16),
           iconSize: 22,
           backgroundColor: kWhite,
           type: BottomNavigationBarType.fixed,
           showUnselectedLabels: false,
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.storefront,
-              ),
+              icon: Icon(Icons.storefront),
               label: 'Shop',
             ),
             BottomNavigationBarItem(
@@ -304,5 +303,3 @@ class _BnbLessScreenState extends ConsumerState<BnbLessScreen> with WidgetsBindi
     );
   }
 }
-
-
