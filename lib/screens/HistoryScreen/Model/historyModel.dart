@@ -14,7 +14,7 @@ class History {
   final bool isSuccessful;
   final String historyPaymentImage;
   final String historyShopName;
-  final int totalHistoryAmount;
+  final double totalHistoryAmount;
   final List<Map<String, dynamic>> history_items;
 
   History({
@@ -51,7 +51,7 @@ class History {
       isSuccessful: data['isSuccessful'],
       historyPaymentImage: data['history_payment_image'],
       historyShopName: data['history_shop_name'],
-      totalHistoryAmount: data['total_history_amount'],
+      totalHistoryAmount: data['total_history_amount'] as double,
       history_items: List<Map<String, dynamic>>.from(data['history_item']),
     );
   }

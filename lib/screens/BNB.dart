@@ -48,7 +48,8 @@ class _BnbLessScreenState extends ConsumerState<BnbLessScreen> with WidgetsBindi
   List<Widget> bnbScreen = [
     const Home_Body_Screen(),
     const Favourite_Screen(),
-      History_Screen(customerId: FirebaseAuth.instance.currentUser!.uid,)
+      // History_Screen(customerId: FirebaseAuth.instance.currentUser!.uid,)
+      History_Screen(customerId: "z2hoSD4BzcNev0tSCmT3mQYnxPz2",)
   ];
 
 
@@ -294,7 +295,7 @@ class _BnbLessScreenState extends ConsumerState<BnbLessScreen> with WidgetsBindi
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.history),
-              label: 'History',
+              label: 'Pre-order',
             ),
           ],
         ),
