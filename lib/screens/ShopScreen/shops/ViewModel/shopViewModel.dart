@@ -21,6 +21,7 @@ class ShopRepository {
         final shop = ShopModel.fromFirestore(shopDoc);
         if(latitude!=null && longitude!=null){
           shop.distance = calculateDistanceInKm(latitude, longitude, shop.latitude, shop.longitude);
+          if(shop.distance>=50) continue;
           shop.distanceText = formatDistance(shop.distance);
         
         }

@@ -80,7 +80,8 @@ class _Home_Body_ScreenState extends ConsumerState<Home_Body_Screen> {
               backgroundColor: kWhite,
               child: shopListAsyncValue.when(data: (shops) {
                 return favShopListAsyncValue.when(data: (favShops) {
-                  return ListView.builder(
+                  return shops.length!=0 ? 
+                   ListView.builder(
                       itemCount: shops.length,
                       itemBuilder: (BuildContext context, int index) {
                         final shop = shops[index];
@@ -90,7 +91,7 @@ class _Home_Body_ScreenState extends ConsumerState<Home_Body_Screen> {
                             mqh: mqh,
                             mqw: mqw,
                             isFavourite: favShops.contains(shop.id));
-                      });
+                      }) : const Center(child: Text('No shops are within 50 Km'));
                 }, error: (error, stackTrace) {
                   return Center(child: Text('Error: $error'));
                 }, loading: () {

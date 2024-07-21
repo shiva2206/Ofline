@@ -16,7 +16,9 @@ exports.resetShopViews = functions.region("asia-south1")
 
         snapshot.forEach((doc) => {
           const shopRef = shopsRef.doc(doc.id);
-          batch.update(shopRef, {views: 0});
+          batch.update(shopRef, {views: 0,
+            total_amount: 0,
+            total_order: 0});
         });
 
         await batch.commit();

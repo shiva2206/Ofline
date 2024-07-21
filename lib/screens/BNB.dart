@@ -48,7 +48,7 @@ class _BnbLessScreenState extends ConsumerState<BnbLessScreen> with WidgetsBindi
  // Bottom Navigation Screens
   List<Widget> bnbScreen = [
     const Home_Body_Screen(key: PageStorageKey('Home')),
-     Favourite_Screen(key: UniqueKey(),),
+    const Favourite_Screen(),
     History_Screen(customerId: FirebaseAuth.instance.currentUser!.uid, key: PageStorageKey('History')),
   ];
 
