@@ -14,12 +14,14 @@ class Custombottomsheet extends StatefulWidget {
   final ShopModel shop;
   final String customerId;
   OverlayEntry? overlayEntry;
+ 
 
   Custombottomsheet(
       {super.key,
       required this.shop,
       required this.customerId,
-      required this.overlayEntry});
+      required this.overlayEntry,
+     });
 
   @override
   State<Custombottomsheet> createState() => _CustombottomsheetState();
@@ -195,7 +197,7 @@ class _CustombottomsheetState extends State<Custombottomsheet> {
                 child: Column(
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(top: 10.0),
+                      padding: const EdgeInsets.only(top: 10.0),
                       child: Center(
                         child: Text(
                           widget.shop.shop_name.toTitleCase(),
@@ -490,7 +492,7 @@ class _CustombottomsheetState extends State<Custombottomsheet> {
                               children: [
                                 Text(
                                   '₹${snapshot.data!.total_amount}',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 14,
                                     color: kGrey,
@@ -515,21 +517,28 @@ class _CustombottomsheetState extends State<Custombottomsheet> {
                             child: Container(
                               height: mqh * 100 / 2340,
                               width: mqw * 275 / 1080,
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(8)),
-                                color: kBlue,
+                                const BorderRadius.all(Radius.circular(8)),
+                                color: cartmdel!.cart_payment_image!="" ? kBlue : kGrey,
                               ),
-                              child: const Center(
-                                child: Text(
-                                  'Pre-order',
-                                  style: TextStyle(
-                                    color: kWhite,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
+                              child:  Center(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      if(cartmdel!.cart_payment_image=="") return;
+
+
+                                    },
+                                    child: const Text(
+                                      'Pre-order',
+                                      style: TextStyle(
+                                        color: kWhite  ,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
                             ),
                           )
                         ],

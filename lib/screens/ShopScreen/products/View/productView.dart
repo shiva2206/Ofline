@@ -44,6 +44,7 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
           child: Custombottomsheet(
+            
             shop: widget.shop,
             customerId: FirebaseAuth.instance.currentUser!.uid,
             overlayEntry: _overlayEntry,
@@ -227,6 +228,11 @@ class _Product_ScreenState extends ConsumerState<Product_Screen> with WidgetsBin
       onPopInvoked: (didPop) async {
         decreaseLiveCount();
         ref.read(searchTextProvider.notifier).state = "";
+          if (_overlayEntry != null) {
+          _overlayEntry!.remove();
+          _overlayEntry = null;
+          // return Future.value(false); // Prevents the default back button action
+        }
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
